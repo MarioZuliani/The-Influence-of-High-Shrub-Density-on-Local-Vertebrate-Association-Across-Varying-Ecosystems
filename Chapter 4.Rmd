@@ -1,0 +1,678 @@
+---
+title: "Chapter 4"
+output: html_document
+date: "2023-08-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load Packages
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(meta)
+library(PRISMAstatement)
+library(skimr)
+library(MASS)
+library(ggpubr)
+```
+```{r}
+setwd("~/Desktop/Chapter 4")
+photo <- read.csv("observations_2022.csv")
+summary(photo)
+```
+```{r}
+photo <- photo %>%
+  filter(common_name != "Human")
+photo <- photo %>%
+  filter(common_name != "Human-Camera Trapper")
+photo <- photo %>%
+  filter(common_name != "Domestic Dog")
+photo <- photo %>%
+  filter(common_name != "Vehicle")
+photo <- photo %>%
+  dplyr::filter(common_name != "Insect")
+photo <- photo %>%
+  dplyr::filter(common_name != "Animal")
+photo <- photo %>%
+  dplyr::filter(common_name != "Bird")
+photo <- photo %>%
+  filter(common_name != "No CV Result")
+  
+count.hit <- photo %>%
+  count(animal.hit) %>%
+  na.omit()
+summary(count.hit)
+### 2022 Had a 5.88% catch rate
+```
+```{r}
+### Animal Observations by Site_Code
+animals_by_sitecode <- photo%>%
+  group_by(site_code, microsite, common_name) %>%
+  summarise(captures = sum(animal.hit), n = n())
+animals_by_sitecode <- animals_by_sitecode %>%
+  filter(common_name != "Blank") 
+```
+
+```{r}
+### Animal observations by Site
+animals_by_site <- photo %>% group_by(site,microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_site <- animals_by_site %>% filter(common_name != "Blank")
+
+```
+
+```{r}
+### Animal observations by Density
+animals_by_density <- photo %>% group_by(microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_density <- animals_by_density %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result")
+```
+```{r}
+### Total Observations 2022
+Total_Observations <- photo %>% group_by(common_name) %>% summarise(total = sum(animal.hit)) %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result")
+```
+
+```{r}
+density_obvs <- merge(animals_by_density, Total_Observations, all = TRUE)
+density_obvs$percent_presence <- density_obvs$captures/density_obvs$total
+```
+
+```{r}
+### Percent proportion Figure
+plot1 <- ggplot(density_obvs, aes(common_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
+plot1 + scale_fill_manual(values = c("#009900", "#0066cc"))
+```
+```{r}
+library(emmeans)
+m1 <- glm(total ~ microsite*common_name, family = "poisson", data = density_obvs)
+anova(m1, test = "Chisq")
+e1 <- emmeans(m1, pairwise~common_name)
+e1
+```
+```{r}
+animals_density <- photo %>% group_by(site_code,microsite,plot, shrub_density, common_name) %>% summarise(captures = sum(animal.hit))
+animals_density <- animals_density %>% filter(common_name != "Blank") %>% filter(common_name != "No CV Result")
+```
+
+### All current PCOA code for 2022 only
+```{r}
+### PCA
+library(vegan)
+library(ape) ### For PCOA
+pca_data <- animals_density ### Created new df for pca data
+pca_data <- pca_data %>%
+  spread(common_name, captures) %>%
+  ungroup() %>%
+  dplyr::select(-site_code, -microsite, -plot) %>%
+  replace(is.na(.),0)
+dim(pca_data)
+
+env <- read.csv("environment.csv") ### Drop Tecopa open 1, Tecopa open 4, since they have no animal observations.
+dim(env)
+
+m01 <- adonis(pca_data ~ microsite*shrub_density, data = env)
+m01
+
+dist <- vegdist(pca_data, species = "bray")
+res <- pcoa(dist)
+p1 <- as.data.frame(res$vectors)%>%
+  dplyr::select(Axis.1, Axis.2) %>%
+  bind_cols(env,.)
+
+ggplot(p1, aes(Axis.1, Axis.2, group = microsite)) +
+  geom_point(aes(color = microsite)) +
+  geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
+  scale_color_brewer(palette = "Set1") +
+  labs(color = "", subtitle = "labels denote plot identity")
+
+m02 <- betadisper(dist, env$microsite)
+m02
+anova(m02)
+permutest(m02,pairwise = TRUE, permutations = 99)
+m02.HSD <- TukeyHSD(m02)
+boxplot(m02)
+```
+```{r}
+m03 <- betadisper(dist, env$shrub_density)
+m03
+anova(m03)
+permutest(m03,pairwise = TRUE, permutations = 99)
+m03.HSD <- TukeyHSD(m03)
+boxplot(m03)
+```
+```{r}
+m04 <- betadisper(dist, env$site)
+m04
+anova(m04)
+permutest(m04,pairwise = TRUE, permutations = 99)
+m04.HSD <- TukeyHSD(m04)
+boxplot(m04)
+```
+### 2023 Data
+```{r}
+photo_2023 <- read.csv("observations_2023.csv")
+summary(photo_2023)
+
+photo_2023 <- photo_2023 %>%
+  filter(common_name != "Human")
+photo_2023 <- photo_2023 %>%
+  filter(common_name != "Human-Camera Trapper")
+photo_2023 <- photo_2023 %>%
+  filter(common_name != "Domestic Dog")
+photo_2023 <- photo_2023 %>%
+  filter(common_name != "Vehicle")
+photo_2023 <- photo_2023 %>%
+  dplyr::filter(common_name != "Insect")
+photo_2023 <- photo_2023 %>%
+  dplyr::filter(common_name != "Animal")
+photo_2023 <- photo_2023 %>%
+  dplyr::filter(common_name != "Bird")
+photo_2023 <- photo_2023 %>%
+  dplyr::filter(common_name != "No CV Result")
+  
+count.hit_2023 <- photo_2023 %>%
+  count(animal.hit) %>%
+  na.omit()
+summary(count.hit_2023)
+
+### 2023 had a 0.28% capture rate
+```
+```{r}
+### Animal Observations by Site_Code
+animals_by_sitecode_2023 <- photo_2023%>%
+  group_by(site_code, microsite, common_name) %>%
+  summarise(captures = sum(animal.hit), n = n())
+animals_by_sitecode_2023 <- animals_by_sitecode_2023 %>%
+  filter(common_name != "Blank") %>% filter(common_name != "No CV Result") 
+```
+```{r}
+### Animal observations by Site 2023
+animals_by_site_2023 <- photo_2023 %>% group_by(site,microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_site_2023 <- animals_by_site_2023 %>% filter(common_name != "Blank") %>% filter(common_name != "No CV Result") 
+
+```
+```{r}
+### Animal observations by Density
+animals_by_density_2023 <- photo_2023 %>% group_by(microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_density_2023 <- animals_by_density_2023 %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result")
+```
+
+```{r}
+### Total Observations 2023
+Total_Observations_2023 <- photo_2023 %>% group_by(common_name) %>% summarise(total = sum(animal.hit)) %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result")
+```
+
+```{r}
+density_obvs_2023 <- merge(animals_by_density_2023, Total_Observations_2023, all = TRUE)
+density_obvs_2023$percent_presence <- density_obvs_2023$captures/density_obvs_2023$total
+```
+
+```{r}
+### Percent proportion Figure
+plot2 <- ggplot(density_obvs_2023, aes(common_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
+plot2 + scale_fill_manual(values = c("#009900", "#0066cc"))
+```
+
+```{r}
+m2<- glm(total ~ microsite*common_name, family = "poisson", data = density_obvs_2023)
+anova(m2, test = "Chisq")
+e2 <- emmeans(m2, pairwise~common_name)
+e2
+```
+
+```{r}
+animals_density_2023 <- photo_2023 %>% group_by(site_code,microsite,plot, shrub_density, common_name) %>% summarise(captures = sum(animal.hit))
+animals_density_2023 <- animals_density_2023 %>% filter(common_name != "Blank")
+```
+
+```{r}
+pca_data_2023 <- animals_density_2023 ### Created new df for pcoa data
+pca_data_2023 <- pca_data_2023 %>%
+  spread(common_name, captures) %>%
+  ungroup() %>%
+  dplyr::select(-site_code, -microsite, -plot) %>%
+  replace(is.na(.),0)
+dim(pca_data_2023)
+
+env_2023 <- read.csv("environment_2023.csv") ### Drop Tecopa open 1, Tecopa open 4, since they have no animal observations.
+dim(env)
+
+model01 <- adonis(pca_data_2023 ~ microsite*shrub_density, data = env_2023)
+model01
+
+dist_2023 <- vegdist(pca_data_2023, species = "bray")
+res_2023 <- pcoa(dist_2023)
+p2 <- as.data.frame(res_2023$vectors)%>%
+  dplyr::select(Axis.1, Axis.2) %>%
+  bind_cols(env_2023,.)
+
+ggplot(p2, aes(Axis.1, Axis.2, group = microsite)) +
+  geom_point(aes(color = microsite)) +
+  geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
+  scale_color_brewer(palette = "Set1") +
+  labs(color = "", subtitle = "labels denote plot identity")
+
+model02 <- betadisper(dist_2023, env_2023$microsite)
+model02
+anova(model02)
+permutest(model02,pairwise = TRUE, permutations = 99)
+model02.HSD <- TukeyHSD(model02)
+boxplot(model02)
+```
+
+```{r}
+model03 <- betadisper(dist_2023, env_2023$shrub_density)
+model03
+anova(model03)
+permutest(model03,pairwise = TRUE, permutations = 99)
+model03.HSD <- TukeyHSD(model03)
+boxplot(model03)
+```
+```{r}
+model04 <- betadisper(dist_2023, env_2023$site)
+model04
+anova(model04)
+permutest(model04,pairwise = TRUE, permutations = 99)
+model04.HSD <- TukeyHSD(model04)
+boxplot(model04)
+```
+### From running the community compositions both in 2022 and 2023 it seems the community compositions across densities, microsites, and sites are all somewhat similar with no significant differences.
+
+## Run PCOAs for both years combined!
+```{r}
+photo_final <- read.csv("observations_final.csv")
+summary(photo_final)
+```
+```{r}
+photo_final <- photo_final %>%
+  filter(common_name != "Human")
+photo_final <- photo_final %>%
+  filter(common_name != "Human-Camera Trapper")
+photo_final <- photo_final %>%
+  filter(common_name != "Domestic Dog")
+photo_final <- photo_final %>%
+  filter(common_name != "Vehicle")
+photo_final <- photo_final %>%
+  dplyr::filter(common_name != "Insect")
+photo_final <- photo_final %>%
+  dplyr::filter(common_name != "Animal")
+photo_final <- photo_final %>%
+  dplyr::filter(common_name != "Bird")
+  
+count.hit_final <- photo_final %>%
+  count(animal.hit) %>%
+  na.omit()
+summary(count.hit_final)
+# Wow we have a 1.489% capture rate for the project!
+```
+
+```{r}
+### Animal Observations by Site_Code
+animals_by_sitecode_final <- photo_final%>%
+  group_by(site_code, microsite, common_name) %>%
+  summarise(captures = sum(animal.hit), n = n())
+animals_by_sitecode_final <- animals_by_sitecode_final %>%
+  filter(common_name != "Blank") %>% filter(common_name != "No CV Result") 
+```
+
+```{r}
+animals_by_site_final <- photo_final %>% group_by(site,microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_site_final <- animals_by_site_final %>% filter(common_name != "Blank") %>% filter(common_name != "No CV Result")
+```
+```{r}
+animals_by_density_final<- photo_final %>% group_by(microsite,common_name) %>% summarise(captures = sum(animal.hit))
+animals_by_density_final <- animals_by_density_final %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result")
+```
+```{r}
+Total_Observations_final <- photo_final %>% group_by(common_name) %>% summarise(total = sum(animal.hit)) %>% filter(common_name != "Blank")  %>% filter(common_name != "No CV Result") %>% filter(common_name != "Mammal")
+```
+
+```{r}
+density_obvs_final <- merge(animals_by_density_final, Total_Observations_final, all = TRUE) %>% filter(common_name != "Mammal")
+density_obvs_final$percent_presence <- density_obvs_final$captures/density_obvs_final$total
+```
+
+```{r}
+### Percent proportion Figure
+plot3 <- ggplot(density_obvs_final, aes(common_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
+plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
+```
+
+```{r}
+m3<- glm(total ~ microsite*common_name, family = "poisson", data = density_obvs_final)
+anova(m3, test = "Chisq")
+e3 <- emmeans(m3, pairwise~common_name)
+e3
+```
+
+```{r}
+animals_density_final <- photo_final %>% group_by(site_code,microsite,plot, shrub_density, common_name) %>% summarise(captures = sum(animal.hit))
+animals_density_final <- animals_density_final %>% filter(common_name != "Blank") %>% filter(common_name != "Mammal")
+```
+
+```{r}
+pca_data_final <- animals_density_final ### Created new df for pca data
+pca_data_final <- pca_data_final %>%
+  spread(common_name, captures) %>%
+  ungroup() %>%
+  dplyr::select(-site_code, -microsite, -plot) %>%
+  replace(is.na(.),0)
+dim(pca_data_final)
+
+env_final <- read.csv("environment_final.csv") ### Drop Tecopa open 1, Tecopa open 4, since they have no animal observations.
+dim(env_final)
+
+model010 <- adonis(pca_data_final ~ microsite*shrub_density, data = env_final)
+model010
+
+dist_final <- vegdist(pca_data_final, species = "bray")
+res_final <- pcoa(dist_final)
+p02 <- as.data.frame(res_final$vectors)%>%
+  dplyr::select(Axis.1, Axis.2) %>%
+  bind_cols(env_final,.)
+
+ggplot(p02, aes(Axis.1, Axis.2, group = microsite)) +
+  geom_point(aes(color = microsite)) +
+  geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
+  scale_color_brewer(palette = "Set1") +
+  labs(color = "", subtitle = "labels denote plot identity")
+
+model020 <- betadisper(dist_final, env_final$microsite)
+model020
+anova(model020)
+permutest(model020,pairwise = TRUE, permutations = 99)
+model020.HSD <- TukeyHSD(model020)
+boxplot(model020)
+```
+```{r}
+model030 <- betadisper(dist_final, env_final$shrub_density)
+model030
+anova(model030)
+permutest(model030,pairwise = TRUE, permutations = 99)
+model030.HSD <- TukeyHSD(model030)
+boxplot(model030)
+```
+```{r}
+### Shows a significant difference between community composition of tested sites (Carrizo -> Cuyama -> Tecopa)
+model040 <- betadisper(dist_final, env_final$site)
+model040
+anova(model040)
+permutest(model040,pairwise = TRUE, permutations = 99)
+model040.HSD <- TukeyHSD(model040)
+boxplot(model040)
+```
+### Temperature Data 2022
+```{r}
+Temp_2022 <- read_csv("Temp Data 2022.csv")
+
+Temp_2022_final <- Temp_2022 %>%
+  group_by(site_code, microsite) %>%
+  summarise(mean_temp = mean(temp), max_temp = max(temp))
+```
+```{r}
+###Ground Temp Data
+Ground_Temp_2022 <- read_csv("Gradient Density Datasheet 2022.csv")
+Ground_Temp_2022_final <- Ground_Temp_2022 %>%
+  group_by(site_code, microsite) %>%
+  summarise(mean_ground_temp = mean(ground_temp), mean_humidity = mean(RH), max_humidity = max(RH), max_ground_temp = max(ground_temp)) 
+### Combine this with new_data
+```
+
+```{r}
+### Aridity Data
+aridity <- read_csv("regional_sites_2022.csv")
+aridity <- aridity %>%
+ dplyr::select(site_code, aridity)
+```
+
+
+
+```{r}
+final_2022<- photo%>%
+  group_by(site, site_code, year, microsite, plot, shrub_density, common_name) %>%
+  summarise(captures = sum(animal.hit), n = n())
+final_2022 <- final_2022 %>%
+  filter(common_name != "Blank")%>% filter(common_name != "No CV Result")
+
+density_simple <- final_2022 %>%
+  group_by(site, site_code, year, microsite, plot, shrub_density) %>%
+  summarise(animals = sum(captures), richness = n()) %>%
+ rename(microsite_number = 'plot')
+
+#write.csv(density_simple, file = "density_simple_fixed.csv") Output density simple because it does not include the sites with 0 observations
+density_simple_fixed <- read.csv("density_simple_fixed.csv")
+density_simple_fixed <- density_simple_fixed[,-1]
+
+```
+
+```{r}
+### This is for 2022 evenness
+vegan_data <- animals_density ### Created new df for pca data
+vegan_data <- vegan_data %>%
+  spread(common_name, captures) %>%
+  ungroup() %>%
+  replace(is.na(.),0)
+
+
+evenness_data <- vegan_data %>%
+  group_by(site_code, microsite) %>%
+  summarize(across(5:29, ~diversity(., index = "shannon")))
+evenness_data <- na.omit(evenness_data)
+
+evenness_data <- evenness_data %>%
+  mutate(Average_Evenness = rowMeans(across(5:26)))
+
+evenness_data <- evenness_data %>%
+  dplyr::select(site_code, microsite, Average_Evenness) 
+### Join evenness_data with density_simple data
+new_data <- inner_join(density_simple_fixed, evenness_data, by = c("site_code", "microsite"))
+
+### Combine new data with logger temp data from 2022
+new_data <- inner_join(new_data, Temp_2022_final,by = c("site_code", "microsite"))
+
+### Need to add ground temperature from hand recordings then 2022 is ready!
+new_data <- inner_join(new_data, Ground_Temp_2022_final, by = c("site_code", "microsite"))
+
+### Combine all data with aridity data of the sites we have
+new_data <- inner_join(new_data, aridity, by = c("site_code"))
+
+### 2022 data is now cleaned and ready to go
+```
+
+
+```{r}
+### Clean up 2023 data so it can be properly combined with 2022 data
+
+final_2023<- photo_2023%>%
+  group_by(site, site_code, year, microsite, plot, shrub_density, common_name) %>%
+  summarise(captures = sum(animal.hit), n = n())
+density_simple_2023 <- final_2023 %>%
+  group_by(site, site_code, year, microsite, plot, shrub_density) %>%
+  summarise(animals = sum(captures), richness = n()) %>%
+ rename(microsite_number = 'plot')
+
+write.csv(density_simple_2023, file = "density_simple_fixed_2023.csv")
+
+
+### This is for 2023 evenness
+vegan_data_2023 <- animals_density_2023 ### Created new df for pca data
+vegan_data_2023 <- vegan_data_2023 %>%
+  spread(common_name, captures) %>%
+  ungroup() %>%
+  replace(is.na(.),0)
+
+evenness_data_2023 <- vegan_data_2023 %>%
+  group_by(site_code, microsite) %>%
+  summarize(across(5:27, ~diversity(., index = "shannon")))
+evenness_data_2023 <- na.omit(evenness_data_2023)
+
+evenness_data_2023 <- evenness_data_2023 %>%
+  mutate(Average_Evenness = rowMeans(across(5:24)))
+evenness_data_2023 <- evenness_data_2023 %>%
+  dplyr::select(site_code, microsite, Average_Evenness) 
+new_data_2023 <- inner_join(density_simple_2023, evenness_data_2023, by = c("site_code", "microsite"))
+
+new_data_2023$site_code <- gsub("Tecopa_Shrub", "Tecopa_shrub", new_data_2023$site_code)
+new_data_2023$site_code <- gsub("Tecopa_Open", "Tecopa_open", new_data_2023$site_code)
+
+### Follow same steps as above 2022 data clean up. Start with logger temp, then ground temp, then aridity.
+
+### Combine new_data_2023 to Temp_2023
+Temp_2023 <- read_csv("Temp Data 2023.csv") %>% filter(!(temp > 50)) %>% filter(!(temp < -47))
+
+Temp_2023_final <- Temp_2023 %>%
+  group_by(site_code, microsite) %>%
+  summarise(mean_temp = mean(temp), max_temp = max(temp))
+
+
+new_data_2023 <- inner_join(new_data_2023, Temp_2023_final, by = c("site_code", "microsite"))
+
+### Combine Ground Temp Data from 2023
+Ground_Temp_2023 <- read_csv("Gradient Density Datasheet 2023.csv")
+Ground_Temp_2023_final <- Ground_Temp_2023 %>%
+  group_by(site_code, microsite, microsite_number) %>%
+  summarise(mean_ground_temp = mean(ground_temp), mean_humidity = mean(RH), max_humidity = max(RH), max_ground_temp = max(ground_temp)) 
+
+new_data_2023 <- inner_join(new_data_2023, Ground_Temp_2023_final, by = c("site_code", "microsite", "microsite_number"))
+
+### Aridity data is already set up from 2022 data
+new_data_2023 <- inner_join(new_data_2023, aridity, by = c("site_code"))
+
+### 2023 Data is now cleaned and ready to be combined with 2022 data
+```
+
+```{r}
+final_data <- rbind(new_data, new_data_2023)
+```
+
+### All Data is combined now into one clean dataframe that can be used to generate figures and statistics (Use final_data)
+
+### Stats for Shrub Density
+
+```{r}
+shapiro.test(final_data$shrub_density)
+```
+
+```{r}
+### Abundance
+model1 <- glm(animals~shrub_density*site*mean_temp*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model1
+anova_results <- aov(model1, test = "Chisq")
+summary(anova_results)
+e2 <- emmeans(model1, pairwise~site|year)
+e2
+### Emmeans contrast shows that during the drought year (2022) areas that are typically less arid such as Cuyama, when experiencing drought, animals are more likely to associate at higher densities than open areas. The is true for Cuyama and Carrizo which are much less arid than Tecopa. These Stats I THINK look good.
+### When you look at 2023 there is no significance when contrasting the sites. Since this was NOT a drought year, but rather a superbloom, then we can conclude that the animals were not entirely dependent on the shrubs to survive, hence why there is no significant differences between the sites.
+```
+```{r}
+shapiro.test(final_data$richness)
+### Richness Stats
+model2 <- glm(richness~shrub_density*site*mean_temp + year + aridity  + mean_humidity, family = "poisson", data = final_data)
+model2
+anova_results2 <- aov(model2, test = "Chisq")
+summary(anova_results2)
+e3 <- emmeans(model2, pairwise~site|year)
+e3  ### Need to double check emmeans it does not match figure
+```
+```{r}
+### Evenness
+model3 <- glm(Average_Evenness~shrub_density*site*mean_temp + year + aridity  + mean_humidity, family = "poisson", data = final_data)
+model3
+anova_results3 <- aov(model3, test = "Chisq")
+summary(anova_results3)
+e4 <- emmeans(model3, pairwise~site|year)
+e4  ### Need to double check emmeans it does not match the figure
+```
+
+
+
+### Data Viz
+```{r}
+### All below in chunk are by site
+
+### Abundance vs Density
+abundance <- ggplot(final_data, aes(shrub_density, animals, color = site)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~year)+
+  scale_color_brewer(palette = "Set1") + theme_classic() + 
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Animal abundance")
+abundance 
+
+richness <- ggplot(final_data, aes(shrub_density, richness, color = site)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~year)+
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness")
+richness
+
+Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~year)+
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
+Evenness
+```
+### Stats for Average Temperature
+```{r}
+### Abundance and temperature
+model4 <- glm(animals~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model4
+anova_results4 <- aov(model4, test = "Chisq")
+summary(anova_results4)
+e5 <- emmeans(model4, pairwise~site)
+e5
+```
+```{r}
+### Richness and temperature
+model5 <- glm(richness~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model5
+anova_results5 <- aov(model5, test = "Chisq")
+summary(anova_results5)
+e6 <- emmeans(model5, pairwise~site)
+e6
+```
+```{r}
+### Evenness and temperature
+model6 <- glm(richness~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model6
+anova_results6 <- aov(model6, test = "Chisq")
+summary(anova_results6)
+e7 <- emmeans(model6, pairwise~site)
+e7
+```
+
+```{r}
+### Ambient Temperature Plots
+
+### Plots of temp might look super ugly.
+
+abundance_temp <- ggplot(final_data, aes(mean_temp, animals)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~site, scales = "free")+
+  scale_color_brewer(palette = "Set1") + theme_classic() + 
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
+  labs(x = "Average Temperature (C)", y = "Animal abundance")
+abundance_temp
+
+richness_temp <- ggplot(final_data, aes(mean_temp, richness)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~site, scales = "free")+
+  scale_color_brewer(palette = "Set1") + theme_classic() + 
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
+  labs(x = "Average Temperature (C)", y = "Species Richness")
+richness_temp
+
+evenness_temp <- ggplot(final_data, aes(mean_temp, Average_Evenness)) +
+  geom_point(size = 0.5) +
+  facet_wrap(~site, scales = "free")+
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
+  labs(x = "Average Temperature (C)", y = "Evenness")
+evenness_temp
+```
+
