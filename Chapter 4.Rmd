@@ -552,42 +552,46 @@ final_data <- rbind(new_data, new_data_2023)
 ### Stats for Shrub Density
 
 ```{r}
-shapiro.test(final_data$shrub_density)
+library(ggpubr)
+shapiro.test(final_data$animals)
+ggqqplot(final_data$animals)
+
 ```
 
 ```{r}
 ### Abundance
-model1 <- glm(animals~shrub_density*site*mean_temp*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model1 <- glm(animals~shrub_density*site*year+aridity, family = "gaussian", data = final_data)
 model1
-anova_results <- aov(model1, test = "Chisq")
-summary(anova_results)
-e2 <- emmeans(model1, pairwise~site|year)
+
+
+anova(model1, test = "Chisq")
+
+e2 <- emmeans(model1, pairwise~site*year)
 e2
 ### Emmeans contrast shows that during the drought year (2022) areas that are typically less arid such as Cuyama, when experiencing drought, animals are more likely to associate at higher densities than open areas. The is true for Cuyama and Carrizo which are much less arid than Tecopa. These Stats I THINK look good.
 ### When you look at 2023 there is no significance when contrasting the sites. Since this was NOT a drought year, but rather a superbloom, then we can conclude that the animals were not entirely dependent on the shrubs to survive, hence why there is no significant differences between the sites.
 ```
 ```{r}
 shapiro.test(final_data$richness)
+ggqqplot(final_data$richness)
 ### Richness Stats
-model2 <- glm(richness~shrub_density*site*mean_temp + year + aridity  + mean_humidity, family = "poisson", data = final_data)
+model2 <- glm(richness~shrub_density*site*year +aridity, family = "gaussian", data = final_data)
 model2
 anova_results2 <- aov(model2, test = "Chisq")
 summary(anova_results2)
-e3 <- emmeans(model2, pairwise~site|year)
-e3  ### Need to double check emmeans it does not match figure
+e3 <- emmeans(model2, pairwise~site*year)
+e3  ### Ok now this all works.
 ```
 ```{r}
+ggqqplot(final_data$Average_Evenness)
 ### Evenness
-model3 <- glm(Average_Evenness~shrub_density*site*mean_temp + year + aridity  + mean_humidity, family = "poisson", data = final_data)
+model3 <- glm(Average_Evenness~shrub_density*site*year + aridity, family = "gaussian", data = final_data)
 model3
 anova_results3 <- aov(model3, test = "Chisq")
 summary(anova_results3)
-e4 <- emmeans(model3, pairwise~site|year)
+e4 <- emmeans(model3, pairwise~site*year)
 e4  ### Need to double check emmeans it does not match the figure
 ```
-
-
-
 ### Data Viz
 ```{r}
 ### All below in chunk are by site
@@ -604,7 +608,7 @@ abundance
 richness <- ggplot(final_data, aes(shrub_density, richness, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  scale_color_brewer(palette = "Set1") + theme_classic() +
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
   labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness")
 richness
@@ -612,7 +616,7 @@ richness
 Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  scale_color_brewer(palette = "Set1") + theme_classic() + 
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
   labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
 Evenness
@@ -620,29 +624,29 @@ Evenness
 ### Stats for Average Temperature
 ```{r}
 ### Abundance and temperature
-model4 <- glm(animals~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model4 <- glm(animals~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model4
 anova_results4 <- aov(model4, test = "Chisq")
 summary(anova_results4)
-e5 <- emmeans(model4, pairwise~site)
+e5 <- emmeans(model4, pairwise~site*year)
 e5
 ```
 ```{r}
 ### Richness and temperature
-model5 <- glm(richness~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model5 <- glm(richness~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model5
 anova_results5 <- aov(model5, test = "Chisq")
 summary(anova_results5)
-e6 <- emmeans(model5, pairwise~site)
+e6 <- emmeans(model5, pairwise~site*year)
 e6
 ```
 ```{r}
 ### Evenness and temperature
-model6 <- glm(richness~mean_temp*site*year + aridity  + mean_humidity, family = "poisson", data = final_data) 
+model6 <- glm(Average_Evenness~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model6
 anova_results6 <- aov(model6, test = "Chisq")
 summary(anova_results6)
-e7 <- emmeans(model6, pairwise~site)
+e7 <- emmeans(model6, pairwise~site*year)
 e7
 ```
 
@@ -653,7 +657,7 @@ e7
 
 abundance_temp <- ggplot(final_data, aes(mean_temp, animals)) +
   geom_point(size = 0.5) +
-  facet_wrap(~site, scales = "free")+
+  facet_wrap(~year, scales = "free")+
   scale_color_brewer(palette = "Set1") + theme_classic() + 
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
   labs(x = "Average Temperature (C)", y = "Animal abundance")
@@ -661,7 +665,7 @@ abundance_temp
 
 richness_temp <- ggplot(final_data, aes(mean_temp, richness)) +
   geom_point(size = 0.5) +
-  facet_wrap(~site, scales = "free")+
+  facet_wrap(~year, scales = "free")+
   scale_color_brewer(palette = "Set1") + theme_classic() + 
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
   labs(x = "Average Temperature (C)", y = "Species Richness")
@@ -669,10 +673,15 @@ richness_temp
 
 evenness_temp <- ggplot(final_data, aes(mean_temp, Average_Evenness)) +
   geom_point(size = 0.5) +
-  facet_wrap(~site, scales = "free")+
+  facet_wrap(~year, scales = "free")+
   scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
   labs(x = "Average Temperature (C)", y = "Evenness")
 evenness_temp
+
+library(patchwork)
+
+temp_plot <- abundance_temp/richness_temp/evenness_temp
+
 ```
 
