@@ -687,6 +687,9 @@ evenness_temp
 temp_plot <- abundance_temp/richness_temp/evenness_temp
 temp_plot
 ```
+
+
+
 ### Final Figures for Publication
 
 ```{r}
