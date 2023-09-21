@@ -337,7 +337,7 @@ density_obvs_final$percent_presence <- density_obvs_final$captures/density_obvs_
 ```{r}
 ### Percent proportion Figure
 plot3 <- ggplot(density_obvs_final, aes(common_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
+plot3 <-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
 ```
 
 ```{r}
@@ -373,11 +373,13 @@ p02 <- as.data.frame(res_final$vectors)%>%
   dplyr::select(Axis.1, Axis.2) %>%
   bind_cols(env_final,.)
 
-ggplot(p02, aes(Axis.1, Axis.2, group = microsite)) +
+pcoa_final <- ggplot(p02, aes(Axis.1, Axis.2, group = microsite)) +
   geom_point(aes(color = microsite)) +
   geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
-  scale_color_brewer(palette = "Set1") +
-  labs(color = "", subtitle = "labels denote plot identity")
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  labs(color = "Shrub Density")
+pcoa_final
+
 
 model020 <- betadisper(dist_final, env_final$microsite)
 model020
@@ -600,15 +602,15 @@ e4  ### Need to double check emmeans it does not match the figure
 abundance <- ggplot(final_data, aes(shrub_density, animals, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() + 
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
-  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Animal abundance")
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Animal Abundance")
 abundance 
 
 richness <- ggplot(final_data, aes(shrub_density, richness, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() +
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
   labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness")
 richness
@@ -616,10 +618,13 @@ richness
 Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() + 
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
   labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
 Evenness
+library(patchwork)
+density_plot <- abundance/richness/Evenness
+density_plot
 ```
 ### Stats for Average Temperature
 ```{r}
@@ -657,31 +662,41 @@ e7
 
 abundance_temp <- ggplot(final_data, aes(mean_temp, animals)) +
   geom_point(size = 0.5) +
-  facet_wrap(~year, scales = "free")+
-  scale_color_brewer(palette = "Set1") + theme_classic() + 
-  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
-  labs(x = "Average Temperature (C)", y = "Animal abundance")
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_brewer(palette = "Set1") +
+  labs(x = "Average Temperature (C)", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none",legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")
 abundance_temp
 
 richness_temp <- ggplot(final_data, aes(mean_temp, richness)) +
   geom_point(size = 0.5) +
   facet_wrap(~year, scales = "free")+
-  scale_color_brewer(palette = "Set1") + theme_classic() + 
-  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
-  labs(x = "Average Temperature (C)", y = "Species Richness")
+  scale_color_brewer(palette = "Set1") + theme(axis.title.x = element_blank()) + labs(tag = "B")+ theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none",legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  geom_smooth(method = lm, se = TRUE) +
+  labs(x = "Average Temperature (C)", y = "Species Richness") + theme(axis.title.x = element_blank())
 richness_temp
 
 evenness_temp <- ggplot(final_data, aes(mean_temp, Average_Evenness)) +
   geom_point(size = 0.5) +
   facet_wrap(~year, scales = "free")+
-  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") +
+  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
   labs(x = "Average Temperature (C)", y = "Evenness")
 evenness_temp
 
-library(patchwork)
-
 temp_plot <- abundance_temp/richness_temp/evenness_temp
+temp_plot
+```
+### Final Figures for Publication
 
+```{r}
+### Figure 1: Abundance, Richness, Evenness vs Shrub Density
+density_plot
+### Figure 2: Abundance, Richness, Evenness vs Average Temperature
+temp_plot
+### Figure 3: PCOA of Communities
+pcoa_final
+### Figure 4: Percent Proportion of Vertebrate species
+plot3
 ```
 
