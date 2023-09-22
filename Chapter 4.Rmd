@@ -610,9 +610,9 @@ abundance
 richness <- ggplot(final_data, aes(shrub_density, richness, color = site)) +
   geom_point(size = 0.5) +
   facet_wrap(~year)+
-  scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  scale_color_brewer(palette = "Set1") + theme_classic() +  theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
-  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness")
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness", color = "Region")
 richness
 
 Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site)) +
@@ -620,7 +620,7 @@ Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site
   facet_wrap(~year)+
   scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
-  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
+  labs(x = expression("Shrub Density per " * 20 * m^2), y = "Mean Evenness")
 Evenness
 library(patchwork)
 density_plot <- abundance/richness/Evenness
@@ -681,7 +681,7 @@ evenness_temp <- ggplot(final_data, aes(mean_temp, Average_Evenness)) +
   facet_wrap(~year, scales = "free")+
   scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) +  labs(tag = "C")+
-  labs(x = "Average Temperature (C)", y = "Evenness")
+  labs(x = expression("Mean Temperature (°C)"), y = "Mean Evenness")
 evenness_temp
 
 temp_plot <- abundance_temp/richness_temp/evenness_temp
@@ -701,5 +701,8 @@ temp_plot
 pcoa_final
 ### Figure 4: Percent Proportion of Vertebrate species
 plot3
+```
+```{r}
+#write.csv(final_data, file = "Final Data.csv")
 ```
 
