@@ -336,7 +336,9 @@ density_obvs_final$percent_presence <- density_obvs_final$captures/density_obvs_
 
 ```{r}
 ### Percent proportion Figure
-plot3 <- ggplot(density_obvs_final, aes(common_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
+#write.csv(density_obvs_final, file = "Animal Observations.csv")
+scientific_names <- read.csv("Animal Observations.csv")
+plot3 <- ggplot(scientific_names, aes(scientific_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
 plot3 <-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
 ```
 
@@ -612,7 +614,7 @@ richness <- ggplot(final_data, aes(shrub_density, richness, color = site)) +
   facet_wrap(~year)+
   scale_color_brewer(palette = "Set1") + theme_classic() +  theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
-  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Species Richness", color = "Region")
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Richness", color = "Region")
 richness
 
 Evenness <- ggplot(final_data, aes(shrub_density, Average_Evenness, color = site)) +
@@ -673,7 +675,7 @@ richness_temp <- ggplot(final_data, aes(mean_temp, richness)) +
   facet_wrap(~year, scales = "free")+
   scale_color_brewer(palette = "Set1") + theme(axis.title.x = element_blank()) + labs(tag = "B")+ theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none",legend.title = element_blank(), axis.text = element_text(size = 10)) +
   geom_smooth(method = lm, se = TRUE) +
-  labs(x = "Average Temperature (C)", y = "Species Richness") + theme(axis.title.x = element_blank())
+  labs(x = "Average Temperature (C)", y = "Richness") + theme(axis.title.x = element_blank())
 richness_temp
 
 evenness_temp <- ggplot(final_data, aes(mean_temp, Average_Evenness)) +
