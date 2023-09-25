@@ -335,14 +335,6 @@ density_obvs_final$percent_presence <- density_obvs_final$captures/density_obvs_
 ```
 
 ```{r}
-### Percent proportion Figure
-#write.csv(density_obvs_final, file = "Animal Observations.csv")
-scientific_names <- read.csv("Animal Observations.csv")
-plot3 <- ggplot(scientific_names, aes(scientific_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
-plot3 <-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
-```
-
-```{r}
 m3<- glm(total ~ microsite*common_name, family = "poisson", data = density_obvs_final)
 anova(m3, test = "Chisq")
 e3 <- emmeans(m3, pairwise~common_name)
@@ -379,7 +371,8 @@ pcoa_final <- ggplot(p02, aes(Axis.1, Axis.2, group = microsite)) +
   geom_point(aes(color = microsite)) +
   geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
   scale_color_brewer(palette = "Set1") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
-  labs(color = "Shrub Density")
+  labs(color = "Microsite")
+pcoa_final <- pcoa_final + labs(x = "Shrub Density Gradient", y = "Community Composition")
 pcoa_final
 
 
@@ -689,6 +682,61 @@ evenness_temp
 temp_plot <- abundance_temp/richness_temp/evenness_temp
 temp_plot
 ```
+### Other posisble figure options
+```{r}
+abundance_2 <- ggplot(final_data, aes(shrub_density, animals)) + geom_point(size = 0.5) +
+  facet_wrap(~year, scales = "free") + scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "A")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Animal Abundance")
+abundance_2
+richness_2 <- ggplot(final_data, aes(shrub_density, richness)) + geom_point(size = 0.5) +
+  facet_wrap(~year, scales = "free") + scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "B")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Richness")
+richness_2
+
+evenness_2 <- ggplot(final_data, aes(shrub_density, Average_Evenness)) + geom_point(size = 0.5) +
+  facet_wrap(~year, scales = "free") + scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
+  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "C")+
+  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
+evenness_2
+
+plot1.1 <- abundance_2/richness_2/evenness_2
+plot1.1
+```
+
+
+```{r}
+### Percent proportion Figure
+#write.csv(density_obvs_final, file = "Animal Observations.csv")
+scientific_names <- read.csv("Animal Observations.csv")
+plot3 <- ggplot(scientific_names, aes(scientific_name, percent_presence, fill = microsite)) + geom_bar(stat = "identity") + coord_flip() + theme_classic() + scale_x_discrete(limits=rev) + xlab("Species") + ylab("Percent Proportion") + labs(fill = "Microsite")
+plot3 <-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
+```
+
+```{r}
+scientific_names <- scientific_names %>%
+  mutate(ordering_var = ifelse(microsite == "Density", 1, 2)) %>%
+  arrange(ordering_var, desc(percent_presence))
+
+# Create the histogram-style figure with reordering
+plot3.2 <- ggplot(scientific_names, aes(fct_inorder(scientific_name), percent_presence, fill = microsite)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_classic() +
+  xlab("Species") +
+  ylab("Percent Proportion") +
+  labs(fill = "Microsite") +
+  scale_fill_manual(values = c("#009900", "#0066cc"))
+
+# Reorder the x-axis labels
+plot3.2 <- plot3.2 + scale_x_discrete(limits = rev(levels(scientific_names$scientific_name)))
+
+# Plot the figure
+print(plot3.2)
+```
+
+
 
 
 
@@ -707,4 +755,3 @@ plot3
 ```{r}
 #write.csv(final_data, file = "Final Data.csv")
 ```
-
