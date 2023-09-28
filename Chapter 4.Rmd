@@ -559,6 +559,18 @@ shapiro.test(final_data$animals)
 ggqqplot(final_data$animals)
 
 ```
+```{r}
+### Stats to show that the aridity across tested regions significantly varies. This needs to be one of the FIRST things you put in your results.
+anova_result <- aov(aridity ~ site, data = final_data)
+summary(anova_result)
+
+tukey_result <- TukeyHSD(anova_result)
+
+# View the Tukey's HSD results
+print(tukey_result)
+### Tukey test shows Cuyama less arid than Carrizo, Carrizo less arid than Tecopa, Cuyama less arid than Tecopa
+```
+
 
 ```{r}
 ### Abundance
@@ -580,6 +592,7 @@ ggqqplot(final_data$richness)
 model2 <- glm(richness~shrub_density*site*year +aridity, family = "gaussian", data = final_data)
 model2
 anova_results2 <- aov(model2, test = "Chisq")
+anova(model2, test = "Chisq")
 summary(anova_results2)
 e3 <- emmeans(model2, pairwise~site*year)
 e3  ### Ok now this all works.
@@ -590,6 +603,7 @@ ggqqplot(final_data$Average_Evenness)
 model3 <- glm(Average_Evenness~shrub_density*site*year + aridity, family = "gaussian", data = final_data)
 model3
 anova_results3 <- aov(model3, test = "Chisq")
+anova(model3, test = "Chisq")
 summary(anova_results3)
 e4 <- emmeans(model3, pairwise~site*year)
 e4  ### Need to double check emmeans it does not match the figure
@@ -632,6 +646,7 @@ density_plot
 model4 <- glm(animals~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model4
 anova_results4 <- aov(model4, test = "Chisq")
+anova(model4, test = "Chisq")
 summary(anova_results4)
 e5 <- emmeans(model4, pairwise~site*year)
 e5
@@ -641,6 +656,7 @@ e5
 model5 <- glm(richness~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model5
 anova_results5 <- aov(model5, test = "Chisq")
+anova(model5, test = "Chisq")
 summary(anova_results5)
 e6 <- emmeans(model5, pairwise~site*year)
 e6
@@ -650,6 +666,7 @@ e6
 model6 <- glm(Average_Evenness~mean_temp*site*year*mean_humidity, family = "gaussian", data = final_data) 
 model6
 anova_results6 <- aov(model6, test = "Chisq")
+anova(model6, test = "Chisq")
 summary(anova_results6)
 e7 <- emmeans(model6, pairwise~site*year)
 e7
