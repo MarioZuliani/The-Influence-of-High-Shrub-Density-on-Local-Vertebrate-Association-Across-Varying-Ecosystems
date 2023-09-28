@@ -367,12 +367,17 @@ p02 <- as.data.frame(res_final$vectors)%>%
   dplyr::select(Axis.1, Axis.2) %>%
   bind_cols(env_final,.)
 
+p02$microsite <- ifelse(p02$microsite == "Density", "Shrub", p02$microsite)
+
 pcoa_final <- ggplot(p02, aes(Axis.1, Axis.2, group = microsite)) +
   geom_point(aes(color = microsite)) +
   geom_text(aes(label=plot), hjust = 0, vjust = 0, check_overlap = TRUE, nudge_x = 0.01)+
   scale_color_brewer(palette = "Set1") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   labs(color = "Microsite")
-pcoa_final <- pcoa_final + labs(x = "Shrub Density Gradient", y = "Community Composition")
+pcoa_final <- pcoa_final + labs(x = "Shrub Density Gradient", y = "Community Composition") + scale_color_manual(
+    values = c("Shrub" = "#009900", "Open" = "#0066cc"), # Change color codes here
+    labels = c("Shrub" = "Shrub", "Open" = "Open")) + coord_fixed(ratio = 1)
+
 pcoa_final
 
 
@@ -697,9 +702,8 @@ richness_2
 
 evenness_2 <- ggplot(final_data, aes(shrub_density, Average_Evenness)) + geom_point(size = 0.5) +
   facet_wrap(~year, scales = "free") + scale_color_brewer(palette = "Set1") + theme_classic() + theme(legend.position = "none") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5),legend.position = "none", legend.title = element_blank(), axis.text = element_text(size = 10)) +
-  geom_smooth(method = lm, se = TRUE) + theme(axis.title.x = element_blank()) + labs(tag = "C")+
-  labs(x = "Shrub Density (Individuals per 20m radius)", y = "Evenness")
-evenness_2
+  geom_smooth(method = lm, se = TRUE) + labs(tag = "C")+
+  labs(x = expression("Shrub Density per " * 20 * m^2), y = "Mean Evenness")
 
 plot1.1 <- abundance_2/richness_2/evenness_2
 plot1.1
@@ -715,9 +719,16 @@ plot3 <-plot3 + scale_fill_manual(values = c("#009900", "#0066cc"))
 ```
 
 ```{r}
+# Assuming you have a dataset named scientific_names with columns: scientific_name, percent_presence, microsite
+
+# Create a new variable to specify the ordering based on presence in density or open areas
+scientific_names$microsite <- ifelse(scientific_names$microsite == "Density", "Shrub", scientific_names$microsite)
+
 scientific_names <- scientific_names %>%
-  mutate(ordering_var = ifelse(microsite == "Density", 1, 2)) %>%
+  mutate(ordering_var = ifelse(microsite == "Shrub", 1, 2)) %>%
   arrange(ordering_var, desc(percent_presence))
+
+
 
 # Create the histogram-style figure with reordering
 plot3.2 <- ggplot(scientific_names, aes(fct_inorder(scientific_name), percent_presence, fill = microsite)) +
@@ -727,14 +738,16 @@ plot3.2 <- ggplot(scientific_names, aes(fct_inorder(scientific_name), percent_pr
   xlab("Species") +
   ylab("Percent Proportion") +
   labs(fill = "Microsite") +
-  scale_fill_manual(values = c("#009900", "#0066cc"))
+  scale_fill_manual(values = c("#0066cc", "#009900")) + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) 
 
 # Reorder the x-axis labels
-plot3.2 <- plot3.2 + scale_x_discrete(limits = rev(levels(scientific_names$scientific_name)))
+plot3.2 <- plot3.2 + scale_x_discrete(limits = rev(levels(scientific_names$scientific_name))) 
 
 # Plot the figure
 print(plot3.2)
+
 ```
+
 
 
 
@@ -744,13 +757,13 @@ print(plot3.2)
 
 ```{r}
 ### Figure 1: Abundance, Richness, Evenness vs Shrub Density
-density_plot
+plot1.1
 ### Figure 2: Abundance, Richness, Evenness vs Average Temperature
 temp_plot
 ### Figure 3: PCOA of Communities
 pcoa_final
 ### Figure 4: Percent Proportion of Vertebrate species
-plot3
+plot3.2
 ```
 ```{r}
 #write.csv(final_data, file = "Final Data.csv")
