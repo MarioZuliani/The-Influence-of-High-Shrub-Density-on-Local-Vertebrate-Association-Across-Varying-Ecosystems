@@ -386,6 +386,7 @@ model020
 anova(model020)
 permutest(model020,pairwise = TRUE, permutations = 99)
 model020.HSD <- TukeyHSD(model020)
+model020.HSD
 boxplot(model020)
 ```
 ```{r}
@@ -403,7 +404,7 @@ model040
 anova(model040)
 permutest(model040,pairwise = TRUE, permutations = 99)
 model040.HSD <- TukeyHSD(model040)
-boxplot(model040)
+supp_plot <- boxplot(model040, xlab = "Region")
 ```
 ### Temperature Data 2022
 ```{r}
@@ -563,6 +564,7 @@ ggqqplot(final_data$animals)
 ### Stats to show that the aridity across tested regions significantly varies. This needs to be one of the FIRST things you put in your results.
 anova_result <- aov(aridity ~ site, data = final_data)
 summary(anova_result)
+emmeans(anova_result, pairwise ~ site)
 
 tukey_result <- TukeyHSD(anova_result)
 
@@ -582,8 +584,7 @@ anova(model1, test = "Chisq")
 
 e2 <- emmeans(model1, pairwise~site*year)
 e2
-### Emmeans contrast shows that during the drought year (2022) areas that are typically less arid such as Cuyama, when experiencing drought, animals are more likely to associate at higher densities than open areas. The is true for Cuyama and Carrizo which are much less arid than Tecopa. These Stats I THINK look good.
-### When you look at 2023 there is no significance when contrasting the sites. Since this was NOT a drought year, but rather a superbloom, then we can conclude that the animals were not entirely dependent on the shrubs to survive, hence why there is no significant differences between the sites.
+
 ```
 ```{r}
 shapiro.test(final_data$richness)
@@ -785,3 +786,267 @@ plot3.2
 ```{r}
 #write.csv(final_data, file = "Final Data.csv")
 ```
+
+### Data Together
+```{r}
+### Test figure with formula (Shrub Density)
+final_data <- final_data %>%
+  mutate(year = as.character(year))
+
+### Density v abundance
+ggplot(final_data, aes(shrub_density, animals, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "A")
+
+### Density v Richness
+ggplot(final_data, aes(shrub_density, richness, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "B")
+
+### Density v Evenness
+ggplot(final_data, aes(shrub_density, Average_Evenness, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "C")
+
+### Aridity v Abundance
+ggplot(final_data, aes(aridity, animals, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "A")
+
+### Aridity v Richness
+ggplot(final_data, aes(aridity, richness, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "B")
+
+### Aridity v Evenness
+ggplot(final_data, aes(aridity, Average_Evenness, color = year)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "C")
+
+
+### Stats
+#install.packages("lme4", type = "source")
+library(lmerTest)
+library(performance)
+#simple
+m1 <- lmer(animals ~ shrub_density + (1|year) + aridity, data = final_data)
+check_collinearity(m1)
+
+anova(m1)
+lsmeansLT(m1)
+ranova(m1) # I think this is to test for random effects across year?
+
+
+m2 <- lmer(richness ~ shrub_density + (1|year) + aridity, data = final_data)
+check_collinearity(m2)
+anova(m2)
+ranova(m2)
+
+m3 <- lmer(Average_Evenness ~ shrub_density + (1|year) + aridity, data = final_data)
+check_collinearity(m3)
+anova(m3)
+ranova(m3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+### Test Trophic Level?
+```{r}
+trophic <- read.csv("Animal Observations.csv")
+
+
+ggplot(trophic, aes(microsite, captures, color = Trophic)) +
+geom_boxplot() +
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "C")
+
+
+m9<- glm(total ~ microsite * Trophic, family = "poisson", data = trophic)
+anova(m9, test = "Chisq")
+e9 <- emmeans(m9, pairwise~microsite|Trophic)
+e9
+```
+
+### Seperate everything by year (Nonlinear better for 2022)
+```{r}
+final_data_2022 <- final_data %>%
+  filter(year == "2022")
+
+shapiro.test(final_data_2022$animals)
+ggqqplot(final_data_2022$animals)
+
+n1 <- glm(animals ~ shrub_density * aridity, family = "gaussian", data = final_data_2022)
+n1
+anova(n1, test = "Chisq")
+cat("Linear Model AIC:", AIC(n1), "\n")
+
+quadratic_model_1 <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, family = "gaussian", data = final_data_2022)
+quadratic_model_1
+anova(quadratic_model_1, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_1), "\n")
+
+if (AIC(quadratic_model_1) < AIC(n1)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+### Richness
+n2 <- glm(richness ~ shrub_density * aridity, family = "gaussian", data = final_data_2022)
+n2
+anova(n2, test = "Chisq")
+cat("Linear Model AIC:", AIC(n2), "\n")
+
+quadratic_model_2 <- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, family = "gaussian", data = final_data_2022)
+quadratic_model_2
+anova(quadratic_model_2, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_2), "\n")
+
+if (AIC(quadratic_model_2) < AIC(n2)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+
+rich_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+### Evenness
+n3 <- glm(Average_Evenness ~ shrub_density * aridity, data = final_data_2022)
+n3
+anova(n3, test = "Chisq")
+cat("Linear Model AIC:", AIC(n3), "\n")
+
+quadratic_model_3 <- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, family = "gaussian", data = final_data_2022)
+quadratic_model_3
+anova(quadratic_model_3, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_2), "\n")
+
+if (AIC(quadratic_model_2) < AIC(n2)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+even_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
+   labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+plot <- abund_dens_2022/rich_dens_2022/even_dens_2022
+plot
+
+
+
+### Temperature (Hold off on this and ask chris)
+
+t1 <- glm(animals ~ shrub_density * mean_temp, family = "gaussian", data = final_data_2022)
+t1
+anova(t1, test = "Chisq")
+cat("Linear Model AIC:", AIC(t1), "\n")
+
+quadratic_temp_1 <- glm(animals ~ shrub_density + I(shrub_density^2) + mean_temp + I(mean_temp^2) + shrub_density:mean_temp, family = "gaussian", data = final_data_2022)
+quadratic_temp_1
+anova(quadratic_temp_1, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_temp_1), "\n")
+
+
+```
+### Shrub Density 2023 (Linear better for 2023)
+```{r}
+final_data_2023 <- final_data %>%
+  filter(year == "2023")
+
+x1 <- glm(animals ~ shrub_density * aridity, family = "gaussian", data = final_data_2023)
+x1
+anova(x1, test = "Chisq")
+cat("Linear Model AIC:", AIC(x1), "\n")
+
+quadratic_model_x1 <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, family = "gaussian", data = final_data_2023)
+quadratic_model_x1
+anova(quadratic_model_x1, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_x1), "\n")
+
+if (AIC(quadratic_model_x1) < AIC(x1)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+abund_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+abund_dens_2023
+
+x2 <- glm(richness ~ shrub_density * aridity, data = final_data_2023)
+x2
+anova(x2, test = "Chisq")
+cat("Linear Model AIC:", AIC(x2), "\n")
+
+quadratic_model_x2 <- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, data = final_data_2023)
+quadratic_model_x2
+anova(quadratic_model_x2, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_x2), "\n")
+
+if (AIC(quadratic_model_x2) < AIC(x2)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+rich_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+rich_dens_2023
+
+x3 <- glm(Average_Evenness ~ shrub_density * aridity, data = final_data_2023)
+x3
+anova(x3, test = "Chisq")
+cat("Linear Model AIC:", AIC(x3), "\n")
+
+quadratic_model_x3 <- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + shrub_density:aridity, data = final_data_2023)
+quadratic_model_x3
+anova(quadratic_model_x3, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(quadratic_model_x3), "\n")
+
+if (AIC(quadratic_model_x1) < AIC(x1)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+even_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, Average_Evenness)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
+   labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+even_dens_2023
+
+plot2 <- abund_dens_2023/rich_dens_2023/even_dens_2023
+plot2
+```
+
