@@ -319,3 +319,21 @@ scale_color_brewer(palette = "Set1") +  labs(x = "Mean Temperature (°C)", y = "
 even_temp_2023
 ```
 
+```{r}
+### Test colinearity 2022
+your_model <- glm(animals ~ shrub_density + I(shrub_density^2) + mean_temp + I(mean_temp^2) + aridity + I(aridity^2) + mean_humidity + I(mean_humidity^2), family = poisson(link = "log"), data = final_data_2022)
+your_model
+
+summary(your_model)
+your_model
+a <- anova(your_model, test = "Chisq")
+a
+
+library(car)
+vif_results <- car::vif(your_model)
+print(vif_results)
+
+cor_matrix <- cor(final_data_2022[, c("shrub_density", "mean_temp", "aridity", "mean_humidity")])
+print(cor_matrix)
+
+```
