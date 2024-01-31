@@ -332,8 +332,123 @@ a
 library(car)
 vif_results <- car::vif(your_model)
 print(vif_results)
-
+```
+```{r}
 cor_matrix <- cor(final_data_2022[, c("shrub_density", "mean_temp", "aridity", "mean_humidity")])
 print(cor_matrix)
+```
+
+```{r}
+library(lmerTest)
+library(performance)
+model <- lmer(animals ~ shrub_density + aridity + mean_temp + mean_humidity + (1|year), data = final_data)
+check_collinearity(model)
+anova(model)
+ranova(model)
+
+### So use one model for everything!
+```
+```{r}
+### 2022 All together since correlation is low/moderate
+a1 <- glm(animals ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a1
+anova(a1, test = "Chisq")
+cat("Linear Model AIC:", AIC(a1), "\n")
+
+q_model_1 <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_1
+anova(q_model_1, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_1), "\n")
+
+if (AIC(quadratic_model_1) < AIC(a1)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+
+a2 <- glm(richness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a2
+anova(a2, test = "Chisq")
+cat("Linear Model AIC:", AIC(a2), "\n")
+
+q_model_2 <- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_2
+anova(q_model_2, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_2), "\n")
+
+if (AIC(q_model_2) < AIC(a2)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+a3 <- glm(Average_Evenness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a3
+anova(a3, test = "Chisq")
+cat("Linear Model AIC:", AIC(a3), "\n")
+
+q_model_3 <- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_3
+anova(q_model_3, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_3), "\n")
+
+if (AIC(q_model_3) < AIC(a3)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
 
 ```
+
+```{r}
+b1 <- glm(animals ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b1
+anova(b1, test = "Chisq")
+cat("Linear Model AIC:", AIC(a1), "\n")
+
+q_model_1b <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_1b
+anova(q_model_1b, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_1b), "\n")
+
+if (AIC(q_model_1b) < AIC(b1)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+
+b2 <- glm(richness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b2
+anova(b2, test = "Chisq")
+cat("Linear Model AIC:", AIC(b2), "\n")
+
+q_model_2b <- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_2b
+anova(q_model_2b, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_2b), "\n")
+
+if (AIC(q_model_2b) < AIC(b2)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+
+b3 <- glm(Average_Evenness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b3
+anova(b3, test = "Chisq")
+cat("Linear Model AIC:", AIC(b3), "\n")
+
+q_model_3b <- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_3b
+anova(q_model_3b, test = "Chisq")
+cat("Quadratic Model AIC:", AIC(q_model_3b), "\n")
+
+if (AIC(q_model_3b) < AIC(b3)) {
+  cat("Quadratic model is better.\n")
+} else {
+  cat("Linear model is better or equally good.\n")
+}
+```
+

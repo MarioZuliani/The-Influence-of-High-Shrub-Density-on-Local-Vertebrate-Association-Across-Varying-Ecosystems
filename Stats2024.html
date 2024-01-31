@@ -1484,6 +1484,530 @@ print(cor_matrix)</code></pre>
 ## mean_temp        0.02938781  1.00000000 -0.85229523   -0.98132444
 ## aridity          0.02585627 -0.85229523  1.00000000    0.80272028
 ## mean_humidity    0.04761062 -0.98132444  0.80272028    1.00000000</code></pre>
+<pre class="r"><code>library(lmerTest)
+library(performance)
+model &lt;- lmer(animals ~ shrub_density + aridity + mean_temp + mean_humidity + (1|year), data = final_data)
+check_collinearity(model)</code></pre>
+<pre><code>## # Check for Multicollinearity
+## 
+## Low Correlation
+## 
+##           Term  VIF    VIF 95% CI Increased SE Tolerance Tolerance 95% CI
+##  shrub_density 1.12 [1.01,  2.44]         1.06      0.89     [0.41, 0.99]
+##        aridity 1.07 [1.00,  4.15]         1.04      0.93     [0.24, 1.00]
+## 
+## Moderate Correlation
+## 
+##           Term  VIF    VIF 95% CI Increased SE Tolerance Tolerance 95% CI
+##      mean_temp 8.07 [5.20, 12.91]         2.84      0.12     [0.08, 0.19]
+##  mean_humidity 8.32 [5.35, 13.31]         2.88      0.12     [0.08, 0.19]</code></pre>
+<pre class="r"><code>anova(model)</code></pre>
+<pre><code>## Type III Analysis of Variance Table with Satterthwaite&#39;s method
+##               Sum Sq Mean Sq NumDF  DenDF F value Pr(&gt;F)  
+## shrub_density  23439   23439     1 40.551  2.1566 0.1497  
+## aridity         2437    2437     1 36.736  0.2243 0.6386  
+## mean_temp      48971   48971     1 39.493  4.5058 0.0401 *
+## mean_humidity   7702    7702     1 36.712  0.7087 0.4053  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>ranova(model)</code></pre>
+<pre><code>## ANOVA-like table for random-effects: Single term deletions
+## 
+## Model:
+## animals ~ shrub_density + aridity + mean_temp + mean_humidity + (1 | year)
+##            npar  logLik    AIC    LRT Df Pr(&gt;Chisq)  
+## &lt;none&gt;        7 -264.75 543.50                       
+## (1 | year)    6 -266.42 544.85 3.3499  1    0.06721 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>### So use one model for everything!</code></pre>
+<pre class="r"><code>### 2022 All together since correlation is low/moderate
+a1 &lt;- glm(animals ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a1</code></pre>
+<pre><code>## 
+## Call:  glm(formula = animals ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2022)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##       594.701          5.718        -87.742        -15.161         12.542  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  19 Residual
+## Null Deviance:       619900 
+## Residual Deviance: 339100    AIC: 309.5</code></pre>
+<pre class="r"><code>anova(a1, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: animals
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev Pr(&gt;Chi)   
+## NULL                             23     619927            
+## shrub_density  1    26978        22     592949 0.218915   
+## aridity        1    71496        21     521453 0.045349 * 
+## mean_temp      1   176488        20     344964 0.001664 **
+## mean_humidity  1     5834        19     339131 0.567519   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(a1), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: 309.4551</code></pre>
+<pre class="r"><code>q_model_1 &lt;- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_1</code></pre>
+<pre><code>## 
+## Call:  glm(formula = animals ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2022)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##           -430.877             127.899             -11.152          -20795.551  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##           2153.917            4108.842             -87.434             162.779  
+## I(mean_humidity^2)  
+##             -2.838  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  15 Residual
+## Null Deviance:       619900 
+## Residual Deviance: 108000    AIC: 290</code></pre>
+<pre class="r"><code>anova(q_model_1, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: animals
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  23     619927              
+## shrub_density       1    26978        22     592949 0.0529192 .  
+## I(shrub_density^2)  1     2942        21     590007 0.5227233    
+## aridity             1    78131        20     511876 0.0009879 ***
+## I(aridity^2)        1   315016        19     196860 3.738e-11 ***
+## mean_temp           1    36333        18     160526 0.0246879 *  
+## I(mean_temp^2)      1    51586        17     108940 0.0074389 ** 
+## mean_humidity       1      215        16     108725 0.8627536    
+## I(mean_humidity^2)  1      711        15     108014 0.7533987    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_1), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: 289.9962</code></pre>
+<pre class="r"><code>if (AIC(quadratic_model_1) &lt; AIC(a1)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
+<pre class="r"><code>a2 &lt;- glm(richness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a2</code></pre>
+<pre><code>## 
+## Call:  glm(formula = richness ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2022)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##       5.01364        0.05630       -3.01765       -0.08542        0.73972  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  19 Residual
+## Null Deviance:       475 
+## Residual Deviance: 29.85     AIC: 85.35</code></pre>
+<pre class="r"><code>anova(a2, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: richness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                             23     474.96              
+## shrub_density  1    6.431        22     468.53 0.0430701 *  
+## aridity        1  133.613        21     334.91 &lt; 2.2e-16 ***
+## mean_temp      1  284.765        20      50.15 &lt; 2.2e-16 ***
+## mean_humidity  1   20.295        19      29.85 0.0003258 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(a2), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: 85.34806</code></pre>
+<pre class="r"><code>q_model_2 &lt;- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_2</code></pre>
+<pre><code>## 
+## Call:  glm(formula = richness ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2022)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##           107.7409             -0.8030              0.0688             99.3440  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##           -10.8127            -37.2859              0.8090              7.0335  
+## I(mean_humidity^2)  
+##            -0.1173  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  15 Residual
+## Null Deviance:       475 
+## Residual Deviance: 15.68     AIC: 77.89</code></pre>
+<pre class="r"><code>anova(q_model_2, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: richness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  23     474.96              
+## shrub_density       1    6.431        22     468.53  0.013127 *  
+## I(shrub_density^2)  1  106.430        21     362.10 &lt; 2.2e-16 ***
+## aridity             1  101.019        20     261.08 &lt; 2.2e-16 ***
+## I(aridity^2)        1  232.882        19      28.20 &lt; 2.2e-16 ***
+## mean_temp           1    0.134        18      28.06  0.720348    
+## I(mean_temp^2)      1   10.796        17      17.27  0.001311 ** 
+## mean_humidity       1    0.371        16      16.89  0.551123    
+## I(mean_humidity^2)  1    1.215        15      15.68  0.281016    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_2), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: 77.89283</code></pre>
+<pre class="r"><code>if (AIC(q_model_2) &lt; AIC(a2)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
+<pre class="r"><code>a3 &lt;- glm(Average_Evenness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2022)
+a3</code></pre>
+<pre><code>## 
+## Call:  glm(formula = Average_Evenness ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2022)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##     -0.983958       0.001086      -0.033891       0.026940       0.024481  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  19 Residual
+## Null Deviance:       0.1455 
+## Residual Deviance: 0.01438   AIC: -97.98</code></pre>
+<pre class="r"><code>anova(a3, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: Average_Evenness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                             23   0.145519              
+## shrub_density  1 0.007333        22   0.138186  0.001851 ** 
+## aridity        1 0.029971        21   0.108215 3.098e-10 ***
+## mean_temp      1 0.071611        20   0.036605 &lt; 2.2e-16 ***
+## mean_humidity  1 0.022229        19   0.014376 5.950e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(a3), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: -97.97747</code></pre>
+<pre class="r"><code>q_model_3 &lt;- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
+q_model_3</code></pre>
+<pre><code>## 
+## Call:  glm(formula = Average_Evenness ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2022)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##           2.766661           -0.026205            0.002274           -1.027071  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##           0.107674           -0.241692            0.005770            0.146552  
+## I(mean_humidity^2)  
+##          -0.002244  
+## 
+## Degrees of Freedom: 23 Total (i.e. Null);  15 Residual
+## Null Deviance:       0.1455 
+## Residual Deviance: 0.005106  AIC: -114.8</code></pre>
+<pre class="r"><code>anova(q_model_3, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: Average_Evenness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  23   0.145519              
+## shrub_density       1 0.007333        22   0.138186 3.460e-06 ***
+## I(shrub_density^2)  1 0.056383        21   0.081804 &lt; 2.2e-16 ***
+## aridity             1 0.018828        20   0.062975 1.026e-13 ***
+## I(aridity^2)        1 0.049621        19   0.013354 &lt; 2.2e-16 ***
+## mean_temp           1 0.001140        18   0.012214  0.067244 .  
+## I(mean_temp^2)      1 0.003081        17   0.009133  0.002626 ** 
+## mean_humidity       1 0.003583        16   0.005550  0.001176 ** 
+## I(mean_humidity^2)  1 0.000444        15   0.005106  0.253210    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_3), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: -114.822</code></pre>
+<pre class="r"><code>if (AIC(q_model_3) &lt; AIC(a3)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
+<pre class="r"><code>b1 &lt;- glm(animals ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b1</code></pre>
+<pre><code>## 
+## Call:  glm(formula = animals ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2023)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##      194.4432         1.3948         3.4741        -8.0000        -0.6446  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  17 Residual
+## Null Deviance:       12650 
+## Residual Deviance: 5738  AIC: 196.8</code></pre>
+<pre class="r"><code>anova(b1, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: animals
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev Pr(&gt;Chi)   
+## NULL                             21    12648.8            
+## shrub_density  1  2257.72        20    10391.1 0.009702 **
+## aridity        1  1570.44        19     8820.6 0.031007 * 
+## mean_temp      1  3018.31        18     5802.3 0.002787 **
+## mean_humidity  1    64.11        17     5738.2 0.662961   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(a1), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: 309.4551</code></pre>
+<pre class="r"><code>q_model_1b &lt;- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_1b</code></pre>
+<pre><code>## 
+## Call:  glm(formula = animals ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2023)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##          -486.3157            -10.0215              0.7863            224.2800  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##           -12.2965            -73.3075              1.4164             30.5245  
+## I(mean_humidity^2)  
+##            -0.3424  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  13 Residual
+## Null Deviance:       12650 
+## Residual Deviance: 2388  AIC: 185.5</code></pre>
+<pre class="r"><code>anova(q_model_1b, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: animals
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  21    12648.8              
+## shrub_density       1  2257.72        20    10391.1 0.0004549 ***
+## I(shrub_density^2)  1    55.46        19    10335.6 0.5826786    
+## aridity             1  1622.60        18     8713.0 0.0029563 ** 
+## I(aridity^2)        1  1189.72        17     7523.3 0.0109254 *  
+## mean_temp           1  2572.77        16     4950.5 0.0001821 ***
+## I(mean_temp^2)      1  1451.04        15     3499.5 0.0049430 ** 
+## mean_humidity       1   529.64        14     2969.8 0.0894861 .  
+## I(mean_humidity^2)  1   582.08        13     2387.7 0.0750425 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_1b), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: 185.5486</code></pre>
+<pre class="r"><code>if (AIC(q_model_1b) &lt; AIC(b1)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
+<pre class="r"><code>b2 &lt;- glm(richness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b2</code></pre>
+<pre><code>## 
+## Call:  glm(formula = richness ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2023)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##      -13.0027         0.1575         0.2489         0.4385         0.1494  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  17 Residual
+## Null Deviance:       95.32 
+## Residual Deviance: 49.66     AIC: 92.35</code></pre>
+<pre class="r"><code>anova(b2, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: richness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev Pr(&gt;Chi)   
+## NULL                             21     95.318            
+## shrub_density  1  25.4984        20     69.820 0.003133 **
+## aridity        1  16.3249        19     53.495 0.018084 * 
+## mean_temp      1   0.3848        18     53.110 0.716651   
+## mean_humidity  1   3.4457        17     49.664 0.277465   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(b2), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: 92.34667</code></pre>
+<pre class="r"><code>q_model_2b &lt;- glm(richness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_2b</code></pre>
+<pre><code>## 
+## Call:  glm(formula = richness ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2023)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##         -172.23925            -0.98555             0.08180            24.28498  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##           -1.33580             2.07678            -0.04053             2.86793  
+## I(mean_humidity^2)  
+##           -0.02884  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  13 Residual
+## Null Deviance:       95.32 
+## Residual Deviance: 26.03     AIC: 86.13</code></pre>
+<pre class="r"><code>anova(q_model_2b, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: richness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  21     95.318              
+## shrub_density       1  25.4984        20     69.820 0.0003585 ***
+## I(shrub_density^2)  1   0.4031        19     69.417 0.6536249    
+## aridity             1  17.3499        18     52.067 0.0032410 ** 
+## I(aridity^2)        1   0.0894        17     51.977 0.8326496    
+## mean_temp           1   0.3069        16     51.670 0.6953844    
+## I(mean_temp^2)      1   8.5804        15     43.090 0.0384262 *  
+## mean_humidity       1  12.9355        14     30.155 0.0110236 *  
+## I(mean_humidity^2)  1   4.1294        13     26.025 0.1509434    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_2b), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: 86.12974</code></pre>
+<pre class="r"><code>if (AIC(q_model_2b) &lt; AIC(b2)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
+<pre class="r"><code>b3 &lt;- glm(Average_Evenness ~ shrub_density + aridity + mean_temp + mean_humidity, data = final_data_2023)
+b3</code></pre>
+<pre><code>## 
+## Call:  glm(formula = Average_Evenness ~ shrub_density + aridity + mean_temp + 
+##     mean_humidity, data = final_data_2023)
+## 
+## Coefficients:
+##   (Intercept)  shrub_density        aridity      mean_temp  mean_humidity  
+##      0.612360       0.008000       0.004847      -0.009961      -0.011192  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  17 Residual
+## Null Deviance:       0.1608 
+## Residual Deviance: 0.01975   AIC: -79.91</code></pre>
+<pre class="r"><code>anova(b3, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: Average_Evenness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##               Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                             21   0.160797              
+## shrub_density  1 0.013715        20   0.147082 0.0005914 ***
+## aridity        1 0.039182        19   0.107900 6.369e-09 ***
+## mean_temp      1 0.068815        18   0.039085 1.410e-14 ***
+## mean_humidity  1 0.019331        17   0.019754 4.530e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Linear Model AIC:&quot;, AIC(b3), &quot;\n&quot;)</code></pre>
+<pre><code>## Linear Model AIC: -79.90611</code></pre>
+<pre class="r"><code>q_model_3b &lt;- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2023)
+q_model_3b</code></pre>
+<pre><code>## 
+## Call:  glm(formula = Average_Evenness ~ shrub_density + I(shrub_density^2) + 
+##     aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + 
+##     I(mean_humidity^2), data = final_data_2023)
+## 
+## Coefficients:
+##        (Intercept)       shrub_density  I(shrub_density^2)             aridity  
+##          6.433e+00           5.868e-03          -1.715e-04          -3.056e-02  
+##       I(aridity^2)           mean_temp      I(mean_temp^2)       mean_humidity  
+##          1.657e-03          -5.691e-01           1.279e-02          -1.462e-03  
+## I(mean_humidity^2)  
+##          4.833e-05  
+## 
+## Degrees of Freedom: 21 Total (i.e. Null);  13 Residual
+## Null Deviance:       0.1608 
+## Residual Deviance: 0.0002097     AIC: -171.9</code></pre>
+<pre class="r"><code>anova(q_model_3b, test = &quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: Average_Evenness
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##                    Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                                  21   0.160797              
+## shrub_density       1 0.013715        20   0.147082 &lt; 2.2e-16 ***
+## I(shrub_density^2)  1 0.020159        19   0.126922 &lt; 2.2e-16 ***
+## aridity             1 0.023110        18   0.103812 &lt; 2.2e-16 ***
+## I(aridity^2)        1 0.096719        17   0.007093 &lt; 2.2e-16 ***
+## mean_temp           1 0.001253        16   0.005840 &lt; 2.2e-16 ***
+## I(mean_temp^2)      1 0.005458        15   0.000381 &lt; 2.2e-16 ***
+## mean_humidity       1 0.000160        14   0.000221  0.001638 ** 
+## I(mean_humidity^2)  1 0.000012        13   0.000210  0.396490    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>cat(&quot;Quadratic Model AIC:&quot;, AIC(q_model_3b), &quot;\n&quot;)</code></pre>
+<pre><code>## Quadratic Model AIC: -171.9054</code></pre>
+<pre class="r"><code>if (AIC(q_model_3b) &lt; AIC(b3)) {
+  cat(&quot;Quadratic model is better.\n&quot;)
+} else {
+  cat(&quot;Linear model is better or equally good.\n&quot;)
+}</code></pre>
+<pre><code>## Quadratic model is better.</code></pre>
 </div>
 
 
