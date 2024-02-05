@@ -53,7 +53,7 @@ if (AIC(quadratic_model_1) < AIC(n1)) {
 
 abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
 geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
-scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
 
 ### Richness
@@ -76,7 +76,7 @@ if (AIC(quadratic_model_2) < AIC(n2)) {
 
 rich_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, richness)) +
 geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
-scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   theme(axis.title.x = element_blank()) + labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
 
 ### Evenness
@@ -100,7 +100,7 @@ even_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, Average_Evenness)) 
 geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
 scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
    labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
-
+even_dens_2022
 plot <- abund_dens_2022/rich_dens_2022/even_dens_2022
 plot
 
@@ -129,7 +129,7 @@ if (AIC(quadratic_model_x1) < AIC(x1)) {
 
 abund_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, animals)) +
 geom_smooth(method = "lm", se = TRUE, color = "black") +
-scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
 abund_dens_2023
 
@@ -151,7 +151,7 @@ if (AIC(quadratic_model_x2) < AIC(x2)) {
 
 rich_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, richness)) +
 geom_smooth(method = "lm", se = TRUE, color = "black") +
-scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
   theme(axis.title.x = element_blank()) + labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
 rich_dens_2023
 
@@ -341,7 +341,7 @@ print(cor_matrix)
 ```{r}
 library(lmerTest)
 library(performance)
-model <- lmer(animals ~ shrub_density + aridity + mean_temp + mean_humidity + (1|year), data = final_data)
+model <- lmer(animals ~ shrub_density + mean_temp + mean_humidity + (1|year), data = final_data)
 check_collinearity(model)
 anova(model)
 ranova(model)
@@ -355,10 +355,10 @@ a1
 anova(a1, test = "Chisq")
 cat("Linear Model AIC:", AIC(a1), "\n")
 
-q_model_1 <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2) + mean_humidity + I(mean_humidity^2), data = final_data_2022)
-q_model_1
-anova(q_model_1, test = "Chisq")
-cat("Quadratic Model AIC:", AIC(q_model_1), "\n")
+#q_model_1 <- glmer(animals ~ shrub_density + aridity  + mean_temp, data = final_data_2022)
+#q_model_1
+#anova(q_model_1, test = "Chisq")
+#cat("Quadratic Model AIC:", AIC(q_model_1), "\n")
 
 if (AIC(quadratic_model_1) < AIC(a1)) {
   cat("Quadratic model is better.\n")
@@ -451,4 +451,558 @@ if (AIC(q_model_3b) < AIC(b3)) {
   cat("Linear model is better or equally good.\n")
 }
 ```
+```{r}
+library(sjPlot)
+q_model_1 <- lmer(Average_Evenness ~ shrub_density + aridity  + mean_temp + (1|year), data = final_data) ### Generalize linear mixed effect models
+q_model_1
+anova(q_model_1, test = "Chisq")
+cat("LMER Model AIC:", AIC(q_model_1), "\n")
+tab_model(q_model_1)
 
+library(ggplot2)
+even_temp <- ggplot(final_data, aes(aridity, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ x +I(x^2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "aridity", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+even_temp
+
+### Work on inflection point
+library(inflection)
+f=function(x){(1/8*x+1/2*x^2)/(1+1/8*x+1/2*x^2)}
+x = final_data$aridity
+y = final_data$Average_Evenness
+
+cc=check_curve(x,y)
+cc
+ese(x,y,cc$index)
+
+ipbese=bese(x,y,cc$index)
+ipbese$iplast
+
+inflection_point <- final_data[which.min(final_data$y), ]
+even_temp + geom_vline(xintercept = inflection_point$aridity, linetype = "dashed", color = "red")
+ 
+
+
+cor.test(final_data_2022$aridity, final_data_2022$mean_humidity,method = c("pearson"))
+```
+
+```{r}
+q_model_2 <- lmer(animals ~ shrub_density + aridity  + mean_temp + (1|year), data = final_data) ### Generalize linear mixed effect models
+q_model_2
+anova(q_model_2, test = "Chisq")
+cat("LMER Model AIC:", AIC(q_model_2), "\n")
+tab_model(q_model_2)
+```
+
+```{r}
+q_model_3 <- lmer(richness ~ shrub_density + aridity  + mean_temp + mean_humidity + (1|year), data = final_data) ### Generalize linear mixed effect models
+q_model_3
+anova(q_model_3, test = "Chisq")
+cat("LMER Model AIC:", AIC(q_model_3), "\n")
+tab_model(q_model_3)
+```
+
+
+```{r}
+arid <- glm(aridity~site * year, data = final_data)
+summary(arid)
+anova(arid, test = "Chisq")
+emmeans(arid, pairwise~site|year)
+
+### 
+```
+```{r}
+temp <- glm(mean_temp~site * year, data = final_data)
+summary(temp)
+anova(temp, test = "Chisq")
+emmeans(temp, pairwise~site|year)
+```
+
+```{r}
+b1 <- glm(Average_Evenness ~ shrub_density + aridity + mean_temp, data = final_data_2022)
+b1
+anova(b1, test = "Chisq")
+
+### Use second degree function for paper!
+q <- glm(Average_Evenness ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2), data = final_data_2023)
+q
+anova(q, test="Chisq")
+```
+
+
+
+
+
+
+
+
+
+```{r}
+corelation_fig <- ggplot(final_data, aes(x = mean_temp, y = mean_humidity)) +
+  geom_point() + labs(fill = "", x = "Temperature (°C)", y = "Humidity (%)") +theme_classic()+theme(aspect.ratio = 1) + geom_smooth(method = lm, se = F) + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7)
+cor <- corelation_fig + stat_cor(method = "pearson")
+cor
+```
+
+```{r}
+### Inflection stuff
+library(inflection)
+q <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) + mean_temp + I(mean_temp^2), data = final_data_2023)
+q
+
+anova(q, test = "Chisq")
+abline(q, col = "red")
+                  
+inflection_point <- find_inflection(final_data$animals, predict(q))
+cat("Inflection Point:", inflection_point, "\n")
+
+
+
+inflection_point <- find_inflection(your_data$abundance, predict(model))
+cat("Inflection Point:", inflection_point, "\n")
+ 
+abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+### 2022 Density
+library(inflection)
+f=function(x){(1/8*x+1/2*x^2)/(1+1/8*x+1/2*x^2)}
+x = final_data_2022$shrub_density
+y = final_data_2022$animals
+
+cc=check_curve(x,y)
+cc
+ese(x,y,cc$index)
+
+ipbese=bese(x,y,cc$index)
+ipbese$iplast
+
+inflection_point_dens_2022 <- final_data_2022[which.min(final_data_2022$y), ]
+Fig1_a <- abund_dens_2022 + geom_vline(xintercept = inflection_point_dens_2022$shrub_density, linetype = 2)
+Fig1_a
+
+
+rich_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+  theme(axis.title.x = element_blank()) + labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+```
+
+
+
+
+
+
+```{r}
+# Assuming your data frame is named final_data_2022
+# Assuming your data has columns 'shrub_density', 'animals', 'richness', 'evenness'
+
+# Load necessary libraries
+# Install and load the bcp package
+#install.packages("changepoint")
+library(changepoint)
+
+# Function to find inflection point using bcp package
+find_inflection_point_cpt <- function(x, y) {
+  data_ts <- data.frame(y = y)
+  cpt_result <- cpt.var(data_ts$y, method = "BinSeg")
+  change_point <- cpts(cpt_result)[1]
+  return(change_point)
+}
+
+# Fit models and find inflection points using bcp
+inflection_animals <- find_inflection_point_cpt(final_data_2022$shrub_density, final_data_2022$animals)
+inflection_richness <- find_inflection_point_cpt(final_data_2022$shrub_density, final_data_2022$richness)
+inflection_evenness <- find_inflection_point_cpt(final_data_2022$shrub_density, final_data_2022$Average_Evenness)
+
+
+# Print inflection points
+cat("Inflection Point for Animals:", inflection_animals, "\n")
+cat("Inflection Point for Richness:", inflection_richness, "\n")
+cat("Inflection Point for Evenness:", inflection_evenness, "\n")
+
+# Plot individual graphs
+# ... (ggplot code and plotting)
+abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per20m Radius", y = "Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_a <- abund_dens_2022 + geom_vline(xintercept = inflection_animals, linetype = 2)
+Fig1_a
+
+rich_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig1_b <- rich_dens_2022 + geom_vline(xintercept = inflection_richness, linetype = 2)
+Fig1_b
+
+even_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
+   labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_c <- even_dens_2022 + geom_vline(xintercept = inflection_evenness, linetype = 2)
+Fig1_c
+
+
+### Now for 2023
+
+find_inflection_point_cpt <- function(x, y) {
+  data_ts <- data.frame(y = y)
+  cpt_result <- cpt.var(data_ts$y, method = "BinSeg")
+  change_point <- cpts(cpt_result)
+  return(change_point)
+}
+
+# Standardize variables
+final_data_2022$standardized_aridity <- scale(final_data_2022$aridity)
+
+# Adjust your model accordingly
+inflection_animals <- find_inflection_point_cpt(final_data_2022$standardized_aridity, final_data_2022$animals)
+inflection_richness <- find_inflection_point_cpt(final_data_2022$standardized_aridity, final_data_2022$richness)
+inflection_evenness <- find_inflection_point_cpt(final_data_2022$standardized_aridity, final_data_2022$Average_Evenness)
+
+
+# Fit models and find inflection points using changepoint
+inflection_animals <- find_inflection_point_cpt(final_data_2022$aridity, final_data_2022$animals)
+inflection_richness <- find_inflection_point_cpt(final_data_2022$aridity, final_data_2022$richness)
+inflection_evenness <- find_inflection_point_cpt(final_data_2022$aridity, final_data_2022$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", ifelse(length(inflection_animals) > 0, inflection_animals, "No clear inflection point"), "\n")
+cat("Inflection Point for Richness:", ifelse(length(inflection_richness) > 0, inflection_richness, "No clear inflection point"), "\n")
+cat("Inflection Point for Evenness:", ifelse(length(inflection_evenness) > 0, inflection_evenness, "No clear inflection point"), "\n")
+
+```
+
+```{r}
+# Function to find inflection point using quadratic model
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+den_inflection_animals <- find_inflection_point_quadratic(final_data_2022$shrub_density, final_data_2022$animals)
+den_inflection_richness <- find_inflection_point_quadratic(final_data_2022$shrub_density, final_data_2022$richness)
+den_inflection_evenness <- find_inflection_point_quadratic(final_data_2022$shrub_density, final_data_2022$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", den_inflection_animals, "\n")
+cat("Inflection Point for Richness:", den_inflection_richness, "\n")
+cat("Inflection Point for Evenness:", den_inflection_evenness, "\n")
+
+
+abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_a <- abund_dens_2022 + geom_vline(xintercept = den_inflection_animals, linetype = 2)
+Fig1_a
+
+rich_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig1_b <- rich_dens_2022 + geom_vline(xintercept = den_inflection_richness, linetype = 2)
+Fig1_b
+
+even_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
+   labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_c <- even_dens_2022 + geom_vline(xintercept = den_inflection_evenness, linetype = 2)
+Fig1_c
+
+
+### Aridity
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+arid_inflection_animals <- find_inflection_point_quadratic(final_data_2022$aridity, final_data_2022$animals)
+arid_inflection_richness <- find_inflection_point_quadratic(final_data_2022$aridity, final_data_2022$richness)
+arid_inflection_evenness <- find_inflection_point_quadratic(final_data_2022$aridity, final_data_2022$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", inflection_animals, "\n")
+cat("Inflection Point for Richness:", inflection_richness, "\n")
+cat("Inflection Point for Evenness:", inflection_evenness, "\n")
+
+abund_arid_2022 <- ggplot(final_data_2022, aes(aridity, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_a <- abund_arid_2022 + geom_vline(xintercept = arid_inflection_animals, linetype = 2)
+Fig2_a
+
+rich_arid_2022 <- ggplot(final_data_2022, aes(aridity, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_b <- rich_arid_2022 + geom_vline(xintercept = arid_inflection_richness, linetype = 2)
+Fig2_b
+
+even_arid_2022 <- ggplot(final_data_2022, aes(aridity, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_c <- even_arid_2022 + geom_vline(xintercept = arid_inflection_evenness, linetype = 2)
+Fig2_c
+
+# Temp
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+temp_inflection_animals_2022 <- find_inflection_point_quadratic(final_data_2022$mean_temp, final_data_2022$animals)
+temp_inflection_richness_2022 <- find_inflection_point_quadratic(final_data_2022$mean_temp, final_data_2022$richness)
+temp_inflection_evenness_2022 <- find_inflection_point_quadratic(final_data_2022$mean_temp, final_data_2022$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", temp_inflection_animals_2022, "\n")
+cat("Inflection Point for Richness:", temp_inflection_richness_2022, "\n")
+cat("Inflection Point for Evenness:", temp_inflection_evenness_2022, "\n")
+
+### Temperature might be linear not second degree?
+
+abund_temp_2022 <- ggplot(final_data_2022, aes(mean_temp, animals)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+abund_temp_2022
+Fig3_a <- abund_temp_2022
+
+rich_temp_2022 <- ggplot(final_data_2022, aes(mean_temp, richness)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "B") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+rich_temp_2022
+Fig3_b <- rich_temp_2022 
+
+even_temp_2022 <- ggplot(final_data_2022, aes(mean_temp, Average_Evenness)) +
+geom_smooth(method = "lm", se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "C") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+even_temp_2022
+Fig3_c <- even_temp_2022
+
+```
+
+```{r}
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+den_inflection_animals_2023 <- find_inflection_point_quadratic(final_data_2023$shrub_density, final_data_2023$animals)
+den_inflection_richness_2023 <- find_inflection_point_quadratic(final_data_2023$shrub_density, final_data_2023$richness)
+den_inflection_evenness_2023 <- find_inflection_point_quadratic(final_data_2023$shrub_density, final_data_2023$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", den_inflection_animals_2023, "\n")
+cat("Inflection Point for Richness:", den_inflection_richness_2023, "\n")
+cat("Inflection Point for Evenness:", den_inflection_evenness_2023, "\n")
+
+abund_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "D") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_d <- abund_dens_2023 + geom_vline(xintercept = den_inflection_animals_2023, linetype = 2)
+Fig1_d
+
+rich_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) +
+labs(tag = "E") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig1_e <- rich_dens_2023 + geom_vline(xintercept = den_inflection_richness_2023, linetype = 2)
+Fig1_e
+
+even_dens_2023 <- ggplot(final_data_2023, aes(shrub_density, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Shrub Density per 20m Radius", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+
+   labs(tag = "F") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+Fig1_f <- even_dens_2023 + geom_vline(xintercept = den_inflection_evenness_2023, linetype = 2)
+Fig1_f
+
+
+### Aridity
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+arid_inflection_animals_2023 <- find_inflection_point_quadratic(final_data_2023$aridity, final_data_2023$animals)
+arid_inflection_richness_2023 <- find_inflection_point_quadratic(final_data_2023$aridity, final_data_2023$richness)
+arid_inflection_evenness_2023 <- find_inflection_point_quadratic(final_data_2023$aridity, final_data_2023$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", arid_inflection_animals_2023, "\n")
+cat("Inflection Point for Richness:", arid_inflection_richness_2023, "\n")
+cat("Inflection Point for Evenness:", arid_inflection_evenness_2023, "\n")
+
+abund_arid_2022 <- ggplot(final_data_2023, aes(aridity, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Animal Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_d <- abund_arid_2022 + geom_vline(xintercept = arid_inflection_animals_2023, linetype = 2)
+Fig2_d
+
+rich_arid_2022 <- ggplot(final_data_2023, aes(aridity, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_e <- rich_arid_2022 + geom_vline(xintercept = arid_inflection_richness_2023, linetype = 2)
+Fig2_e
+
+even_arid_2022 <- ggplot(final_data_2023, aes(aridity, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Aridity", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig2_f <- even_arid_2022 + geom_vline(xintercept = arid_inflection_evenness_2023, linetype = 2)
+Fig2_f
+
+### Temp
+find_inflection_point_quadratic <- function(x, y) {
+  quadratic_model <- lm(y ~ poly(x, 2, raw = TRUE))
+  vertex <- -coef(quadratic_model)[2] / (2 * coef(quadratic_model)[3])
+  return(vertex)
+}
+
+# Find inflection points using quadratic model
+temp_inflection_animals_2023 <- find_inflection_point_quadratic(final_data_2023$mean_temp, final_data_2023$animals)
+temp_inflection_richness_2023 <- find_inflection_point_quadratic(final_data_2023$mean_temp, final_data_2023$richness)
+temp_inflection_evenness_2023 <- find_inflection_point_quadratic(final_data_2023$mean_temp, final_data_2023$Average_Evenness)
+
+# Print inflection points
+cat("Inflection Point for Animals:", temp_inflection_animals_2023, "\n")
+cat("Inflection Point for Richness:", temp_inflection_richness_2023, "\n")
+cat("Inflection Point for Evenness:", temp_inflection_evenness_2023, "\n")
+
+abund_temp_2023 <- ggplot(final_data_2023, aes(mean_temp, animals)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Abundance") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "D") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig3_d <- abund_temp_2023 + geom_vline(xintercept = temp_inflection_animals_2023, linetype = 2)
+Fig3_d
+
+rich_temp_2023 <- ggplot(final_data_2023, aes(mean_temp, richness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Richness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "E") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+
+Fig3_e <- rich_temp_2023 + geom_vline(xintercept = temp_inflection_richness_2023, linetype = 2)
+Fig3_e
+
+even_temp_2023 <- ggplot(final_data_2023, aes(mean_temp, Average_Evenness)) +
+geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") + facet_wrap(~year)+
+scale_color_brewer(palette = "Set1") +  labs(x = "Temperature (°C)", y = "Evenness") + theme_classic() + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10))+ labs(tag = "F") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
+even_temp_2023
+
+Fig3_f <- even_temp_2023 + geom_vline(xintercept = temp_inflection_evenness_2023, linetype = 2)
+Fig3_f
+```
+
+```{r}
+library(patchwork)
+Figure_1 <- (Fig1_a + Fig1_b + Fig1_c) / (Fig1_d + Fig1_e + Fig1_f)
+Figure_1
+
+combined_plots <- (
+  Fig1_a + Fig1_d + Fig1_b + Fig1_e + Fig1_c + Fig1_f
+) + plot_layout(ncol = 2)
+combined_plots
+
+
+combined_plots_temp <- (Fig3_a + Fig3_d + Fig3_b + Fig3_e + Fig3_c +Fig3_f) + plot_layout(ncol=2)
+combined_plots_temp
+```
+```{r}
+m1.1 <- glm(animals ~ poly(shrub_density,2, raw = TRUE) + mean_temp, family = poisson, final_data_2022)
+summary(m1.1)
+a <- anova(m1.1, test = "Chisq")
+a
+
+
+m1.2 <- glm(animals ~  poly(shrub_density, 2, raw = TRUE) + mean_temp, family = poisson, final_data_2023)
+summary(m1.2)
+anova(m1.2, test = "Chisq")
+```
+```{r}
+m2.1 <- glm(richness ~  poly(shrub_density, 2, raw = TRUE) + mean_temp, family = gaussian, final_data_2022)
+summary(m2.1)
+anova(m2.1, test = "Chisq")
+m2.2 <- glm(richness ~ poly(shrub_density, 2, raw = TRUE) + mean_temp, family = gaussian, final_data_2023)
+summary(m2.2)
+anova(m2.2, test = "Chisq")
+```
+```{r}
+m3.1 <- glm(Average_Evenness ~  poly(shrub_density, 2, raw = TRUE) + mean_temp, family = gaussian, final_data_2022)
+summary(m3.1)
+anova(m3.1, test = "Chisq")
+m3.2 <- glm(Average_Evenness ~ poly(shrub_density, 2, raw = TRUE) + mean_temp, family = gaussian, final_data_2023)
+summary(m3.2)
+anova(m3.2, test = "Chisq")
+```
+
+```{r}
+library(tidyverse)
+final_data <- read.csv("Final Data.csv")
+
+
+site <- final_data %>%
+  dplyr::select(site_code, year, shrub_density, animals, richness, Average_Evenness, mean_temp, aridity) %>%
+  group_by(site_code, year) %>%
+  summarise(shrub_density = sum(shrub_density), animals = mean(animals), richness = mean(richness), evenness = mean(Average_Evenness), aridity = aridity)%>%
+    mutate(animals = as.integer(animals))
+
+site_2022 <- site%>%
+  filter(year == 2022)
+
+site_2023 <- site %>%
+  filter(year ==2023)
+```
+
+
+```{r}
+m4 <- glm(animals ~  poly(shrub_density,2, raw = TRUE) * aridity, family = poisson, site_2022)
+summary(m4)
+anova(m4, test = "Chisq")
+
+```
+```{r}
+m5 <- glm(richness ~  poly(shrub_density,2, raw = TRUE) * aridity, family = gaussian, site_2022)
+summary(m5)
+anova(m5, test = "Chisq")
+```
+
+```{r}
+m6 <- glm(evenness ~  poly(shrub_density,2, raw = TRUE) * aridity, family = gaussian, site_2022)
+summary(m6)
+anova(m6, test = "Chisq")
+```
+```{r}
+m7 <- glm(animals ~  poly(shrub_density,2, raw = TRUE) * aridity, family = poisson, site_2023)
+summary(m7)
+anova(m7, test = "Chisq")
+```
+```{r}
+m8 <- glm(richness ~  poly(shrub_density,2, raw = TRUE) * aridity, family = poisson, site_2023)
+summary(m8)
+anova(m8, test = "Chisq")
+```
+```{r}
+m9 <- glm(evenness ~  poly(shrub_density,2, raw = TRUE) * aridity, family = gaussian, site_2023)
+summary(m9)
+anova(m9, test = "Chisq")
+```
