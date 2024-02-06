@@ -466,21 +466,7 @@ scale_color_brewer(palette = "Set1") +  labs(x = "aridity", y = "Evenness") + th
   theme(axis.title.x = element_blank()) + labs(tag = "A") + theme(text = element_text(size = 12), panel.border = element_rect(color = "black", fill = NA, size = 1.5), axis.text = element_text(size = 10)) + theme(aspect.ratio = 0.7) + theme(legend.position = "none") + theme(legend.text = element_text(size = 8))
 even_temp
 
-### Work on inflection point
-library(inflection)
-f=function(x){(1/8*x+1/2*x^2)/(1+1/8*x+1/2*x^2)}
-x = final_data$aridity
-y = final_data$Average_Evenness
 
-cc=check_curve(x,y)
-cc
-ese(x,y,cc$index)
-
-ipbese=bese(x,y,cc$index)
-ipbese$iplast
-
-inflection_point <- final_data[which.min(final_data$y), ]
-even_temp + geom_vline(xintercept = inflection_point$aridity, linetype = "dashed", color = "red")
  
 
 
@@ -505,6 +491,7 @@ tab_model(q_model_3)
 
 
 ```{r}
+library(emmeans)
 arid <- glm(aridity~site * year, data = final_data)
 summary(arid)
 anova(arid, test = "Chisq")
@@ -552,15 +539,15 @@ q <- glm(animals ~ shrub_density + I(shrub_density^2) + aridity + I(aridity^2) +
 q
 
 anova(q, test = "Chisq")
-abline(q, col = "red")
+#abline(q, col = "red")
                   
-inflection_point <- find_inflection(final_data$animals, predict(q))
-cat("Inflection Point:", inflection_point, "\n")
+#inflection_point <- find_inflection(final_data$animals, predict(q))
+#cat("Inflection Point:", inflection_point, "\n")
 
 
 
-inflection_point <- find_inflection(your_data$abundance, predict(model))
-cat("Inflection Point:", inflection_point, "\n")
+#inflection_point <- find_inflection(your_data$abundance, predict(model))
+#cat("Inflection Point:", inflection_point, "\n")
  
 abund_dens_2022 <- ggplot(final_data_2022, aes(shrub_density, animals)) +
 geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "black") +
