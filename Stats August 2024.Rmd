@@ -1,0 +1,110 @@
+---
+title: "Stats August 2024"
+author: "Mario Zuliani"
+date: "2024-08-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(vegan)
+library(dplyr)
+library(car)
+library(knitr)
+```
+
+### Plot Level 2022
+```{r}
+plot_2022 <- read.csv("plot_2022.csv")
+
+### Abundance Nonlinear
+m1.1 <- glm(animals ~ poly(shrub_density,2, raw = TRUE) + mean_temp + microsite %in%site_code, family = poisson, plot_2022)
+summary(m1.1)
+a <- anova(m1.1, test = "Chisq")
+a
+
+### Richness Linear
+m2.2 <- glm(Species_Richness ~ shrub_density + mean_temp + microsite %in%site_code, family = poisson, plot_2022)
+summary(m2.2)
+a2.2 <- anova(m2.2, test = "Chisq")
+a2.2
+
+### Evenness Linear
+m3.2 <- glm(Evenness ~ shrub_density + mean_temp + microsite %in%site_code, family = gaussian,plot_2022)
+summary(m3.2)
+a3.2 <- anova(m3.2, test = "Chisq")
+a3.2
+```
+
+### Plot Level 2023
+```{r}
+plot_2023 <- read.csv("plot_2023.csv")
+
+### Abundance Non-linear
+e1.1 <- glm(animals ~ poly(shrub_density,2, raw = TRUE) + mean_temp + microsite %in%site_code, family = poisson, plot_2023)
+summary(e1.1)
+a <- anova(e1.1, test = "Chisq")
+a
+
+### Richness Linear
+e2.2 <- glm(Species_Richness ~ shrub_density + mean_temp + microsite %in%site_code, family = poisson, plot_2023)
+summary(e2.2)
+a2.2 <- anova(e2.2, test = "Chisq")
+a2.2
+
+### Evenness Linear
+e3.2 <- glm(Evenness ~ shrub_density + mean_temp + microsite %in%site_code, family = gaussian,plot_2023)
+summary(e3.2)
+a3.2 <- anova(e3.2, test = "Chisq")
+a3.2
+```
+
+### Site Level 2022
+```{r}
+tidy_site_2022 <- read.csv("tidy_site_2022.csv")
+
+### Abundance Linear
+z1.1 <- glm(total_animals ~ poly(total_shrub_density,2, raw = TRUE) + aridity, family = poisson, tidy_site_2022)
+summary(z1.1)
+b <- anova(z1.1, test = "Chisq")
+b
+
+### Richness Linear
+z2.2 <- glm(Species_Richness ~ total_shrub_density + aridity, family = poisson, tidy_site_2022)
+summary(z2.2)
+b.2.2 <- anova(z2.2, test = "Chisq")
+b.2.2
+
+### Evenness Linear
+z3.2 <- glm(Evenness ~ total_shrub_density + aridity, family = gaussian, tidy_site_2022)
+summary(z3.2)
+b.3.2 <- anova(z3.2, test = "Chisq")
+b.3.2
+```
+
+### Site Level 2023
+```{r}
+tidy_site_2023 <- read.csv("tidy_site_2023.csv")
+
+### Abundance Nonlinear
+y1.1 <- glm(total_animals ~ poly(total_shrub_density,2, raw = TRUE) + aridity, family = poisson, tidy_site_2023)
+summary(y1.1)
+b <- anova(y1.1, test = "Chisq")
+b
+
+### Richness Linear
+y2.2 <- glm(Species_Richness ~ total_shrub_density + aridity, family = poisson, tidy_site_2023)
+summary(y2.2)
+b.2.2 <- anova(y2.2, test = "Chisq")
+b.2.2
+
+### Evenness Nonlinear
+y3.1 <- glm(Evenness ~ poly(total_shrub_density,2, raw = TRUE) + aridity, family = gaussian, tidy_site_2023)
+summary(y3.1)
+b3.1 <- anova(y3.1, test = "Chisq")
+b3.1
+```
+
